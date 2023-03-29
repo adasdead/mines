@@ -3,7 +3,7 @@
 
 #include "glad/glad.h"
 
-#include "basic_types.h"
+#include "util/basic_types.h"
 
 struct texture {
     GLuint  id;

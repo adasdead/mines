@@ -1,5 +1,5 @@
-#ifndef LOGGER_H
-#define LOGGER_H
+#ifndef UTIL_LOGGER_H
+#define UTIL_LOGGER_H
 
 #include <stdlib.h>
 #include <stdarg.h>
@@ -26,4 +26,4 @@ enum logger_level {
 void logger_log(enum logger_level level, const char *file_name,
                 usize line_no, const char *__restrict format, ...);
 
-#endif /* LOGGER_H */
+#endif /* UTIL_LOGGER_H */

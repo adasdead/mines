@@ -1,5 +1,5 @@
-#ifndef TYPES_H
-#define TYPES_H
+#ifndef UTIL_BASIC_TYPES_H
+#define UTIL_BASIC_TYPES_H
 
 #include <stdint.h>
 #include <float.h>
@@ -14,4 +14,4 @@ typedef uint64_t    usize;
 
 typedef float       f32;
 
-#endif /* TYPES_H */
+#endif /* UTIL_BASIC_TYPES_H */

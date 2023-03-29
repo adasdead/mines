@@ -4,7 +4,7 @@
 #include <string.h>
 #include <errno.h>
 
-#include "logger.h"
+#include "util/logger.h"
 
 static char *read_strings_from_file(const char *file_path)
 {

@@ -7,7 +7,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb/stb_image.h"
 
-#include "logger.h"
+#include "util/logger.h"
 
 struct texture *texture_load(const char *file_path)
 {

@@ -6,9 +6,27 @@
 #include "graphics/shader.h"
 #include "graphics/texture.h"
 
+#include "util/resources.h"
+
 #include "math/projection.h"
 
 #include "field.h"
+
+static struct field *field;
+
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
+{
+    double x, y;
+
+    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+        glfwGetCursorPos(window, &x, &y);
+
+        union cell *cell = field_cell(field, ((int) x - 60) / 60,
+                                             ((int) y - 60) / 60);
+
+        cell->state = CELL_STATE_OPENED;
+    }
+}
 
 int main(void)
 {
@@ -26,71 +44,30 @@ int main(void)
     }
 
     glfwMakeContextCurrent(window);
+    glfwSetMouseButtonCallback(window, mouse_button_callback);
 
     gladLoadGLLoader((GLADloadproc) glfwGetProcAddress);
 
-    GLuint VBO, VAO;
-
-    glGenBuffers(1, &VBO);
-    glGenVertexArrays(1, &VAO);
-
-    struct field *field = field_create(3, 3, 5);
+    resources_load();
+    
+    field = field_create(6, 6, 5);
     field_generate(field, 2, 2);
 
-    u8 *value = (u8*) field->cells;
-
-    for (int i = 0; i < field->width; i++) {
-        for (int j = 0; j < field->height; j++) {
-            printf("%d ", value[field->width * i + j]);
-        }
-
-        printf("\n");
-    }
-
-    static u8 info[] = {
-        1, 2, 3,
-        4, 5, 6,
-        7, 8, 9
-    };
-    
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof info, info, GL_STATIC_DRAW);
-
-    glBindVertexArray(VAO);
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 1, GL_UNSIGNED_BYTE, GL_FALSE, sizeof *info, NULL);
-
-    glBindBuffer(GL_ARRAY_BUFFER, GL_NONE);
-    glBindVertexArray(GL_NONE);
-
-    shader_t shader = shader_load_g("default.vs.glsl", "default.fs.glsl",
-                                    "default.gs.glsl");
-
-    struct texture *atlas = texture_load("atlas.png");
-
-    m4x4 projection = projection_ortho(0, field->width, field->height, 0, -1, 1);
+    m4x4 projection = projection_ortho(0, field->width + 2,
+                                       field->height + 2, 0, -1, 1);
 
     while (!glfwWindowShouldClose(window)) {
         glClearColor(1.0f, 0.0f, 1.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        shader_use(shader);
-        shader_set_uniform_m4fv(shader, "projection", projection);
-        shader_set_uniform_2i(shader, "mapSize", field->width, field->height);
-
-        texture_bind(atlas);
-
-        glBindVertexArray(VAO);
-        glDrawArrays(GL_POINTS, 0, field->width * field->height);
-        glBindVertexArray(GL_NONE);
+        field_render(field, projection);
 
         glfwSwapBuffers(window);
-        glfwPollEvents();
+        glfwWaitEvents();
     }
 
-    shader_free(shader);
-    texture_free(atlas);
     field_free(field);
+    resources_free();
 
     glfwTerminate();
     return 0;

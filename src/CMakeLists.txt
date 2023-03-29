@@ -9,7 +9,8 @@ target_sources(${PROJECT_NAME} PRIVATE
     graphics/shader.c
     graphics/texture.c
 
-    logger.c
+    util/resources.c
+    util/logger.c
 
     field.c
 )
