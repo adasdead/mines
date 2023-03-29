@@ -7,8 +7,11 @@ target_sources(${PROJECT_NAME} PRIVATE
     glad/glad.c
 
     graphics/shader.c
+    graphics/texture.c
 
     logger.c
+
+    field.c
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE
@@ -25,4 +28,5 @@ target_link_libraries(${PROJECT_NAME}
     ${MATH_LIB}
     OpenGL::GL
     glfw
+    m
 )

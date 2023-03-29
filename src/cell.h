@@ -25,11 +25,11 @@
 #define CELL_TYPE_FLAG                  14
 
 union cell {
-    u8              raw_number;
+    u8 byte;
 
     struct {
-        u8          state : 4;
-        u8          type : 4;
+        u8 type  : 4;
+        u8 state : 4;
     };
 };
 

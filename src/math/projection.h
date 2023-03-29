@@ -1,7 +1,7 @@
 #ifndef MATH_PROJECTION_H
 #define MATH_PROJECTION_H
 
-#include "matrix4x4.h"
+#include "math/matrix4x4.h"
 
 static m4x4 projection_ortho(f32 left, f32 right, f32 bottom, f32 top,
                              f32 near, f32 far)
