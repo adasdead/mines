@@ -1,5 +1,5 @@
-#ifndef CELL_H
-#define CELL_H
+#ifndef GAME_CELL_H
+#define GAME_CELL_H
 
 #include "util/basic_types.h"
 
@@ -33,4 +33,4 @@ union cell {
     };
 };
 
-#endif /* CELL_H */
+#endif /* GAME_CELL_H */

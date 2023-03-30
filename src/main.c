@@ -1,73 +1,75 @@
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
+#include "graphics/opengl.h"
 
-#include <stdio.h>
+#include "game/game.h"
+#include "game/window.h"
 
-#include "graphics/shader.h"
-#include "graphics/texture.h"
-
+#include "util/logger.h"
 #include "util/resources.h"
 
-#include "math/projection.h"
-
-#include "field.h"
-
-static struct field *field;
-
-void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
+static void on_glfw_error_callback(int code, const char *message)
 {
-    double x, y;
+    logger_warn("GLFW Error: %s", message);
+}
 
-    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
-        glfwGetCursorPos(window, &x, &y);
-
-        union cell *cell = field_cell(field, ((int) x - 60) / 60,
-                                             ((int) y - 60) / 60);
-
-        cell->state = CELL_STATE_OPENED;
+static void on_glfw_key_callback(GLFWwindow* window,
+                                 int key, int scancode,
+                                 int action, int mods)
+{
+    if (action != GLFW_PRESS) {
+        return;
     }
+
+    switch (key)
+    {
+    case GLFW_KEY_ESCAPE:
+        glfwSetWindowShouldClose(window_glfw(), GLFW_TRUE);
+        break;
+    
+    case GLFW_KEY_D:
+        game_toggle_difficulty();
+        break;
+    }
+}
+
+static void init(void)
+{
+    if (!glfwInit()) {
+        logger_fatal("GLFW initialization failed");
+    }
+
+    glfwSetErrorCallback(on_glfw_error_callback);
+
+    window_init();
+
+    if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {
+        window_free();
+        glfwTerminate();
+        logger_fatal("GLAD initialization failed");
+    }
+
+    glfwSetKeyCallback(window_glfw(), on_glfw_key_callback);
 }
 
 int main(void)
 {
-    GLFWwindow* window;
-
-    if (!glfwInit())
-        return -1;
-
-    window = glfwCreateWindow(480, 480, "Hello", NULL, NULL);
-
-    if (!window)
-    {
-        glfwTerminate();
-        return -1;
-    }
-
-    glfwMakeContextCurrent(window);
-    glfwSetMouseButtonCallback(window, mouse_button_callback);
-
-    gladLoadGLLoader((GLADloadproc) glfwGetProcAddress);
-
+    init();
     resources_load();
-    
-    field = field_create(6, 6, 5);
-    field_generate(field, 2, 2);
 
-    m4x4 projection = projection_ortho(0, field->width + 2,
-                                       field->height + 2, 0, -1, 1);
+    game_start();
 
-    while (!glfwWindowShouldClose(window)) {
-        glClearColor(1.0f, 0.0f, 1.0f, 1.0f);
+    while (!glfwWindowShouldClose(window_glfw())) {
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        field_render(field, projection);
+        game_loop(window_projection());
 
-        glfwSwapBuffers(window);
+        glfwSwapBuffers(window_glfw());
         glfwWaitEvents();
     }
 
-    field_free(field);
+    game_free();
     resources_free();
+    window_free();
 
     glfwTerminate();
     return 0;

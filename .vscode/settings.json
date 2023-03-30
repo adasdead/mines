@@ -4,6 +4,8 @@
         "type_traits": "c",
         "basic_types.h": "c",
         "logger.h": "c",
-        "resources.h": "c"
+        "resources.h": "c",
+        "cell.h": "c",
+        "numbers": "c"
     }
 }

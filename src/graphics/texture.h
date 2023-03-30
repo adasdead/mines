@@ -1,7 +1,7 @@
 #ifndef GRAPHICS_TEXTURE_H
 #define GRAPHICS_TEXTURE_H
 
-#include "glad/glad.h"
+#include "graphics/opengl.h"
 
 #include "util/basic_types.h"
 

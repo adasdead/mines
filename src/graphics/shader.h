@@ -1,7 +1,7 @@
 #ifndef GRAPHICS_SHADER_H
 #define GRAPHICS_SHADER_H
 
-#include "glad/glad.h"
+#include "graphics/opengl.h"
 
 #include "math/matrix4x4.h"
 

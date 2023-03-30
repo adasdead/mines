@@ -12,7 +12,9 @@ target_sources(${PROJECT_NAME} PRIVATE
     util/resources.c
     util/logger.c
 
-    field.c
+    game/game.c
+    game/window.c
+    game/field.c
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE

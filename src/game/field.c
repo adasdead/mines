@@ -3,8 +3,12 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "game/window.h"
+
 #include "util/resources.h"
 #include "util/logger.h"
+
+#include "definitions.h"
 
 static usize field_get_adjacent_mines(const struct field *field,
                                       u32 x, u32 y)
@@ -123,13 +127,25 @@ void field_generate(const struct field *field, u32 x, u32 y)
 
 void field_render(const struct field *field, m4x4 projection)
 {
+    i32 x, y;
     shader_t shader = resources_shader(RS_SHADER_FIELD);
     usize size = field->width * field->height * sizeof(u8);
 
+    window_mouse_pos(&x, &y);
+
+    x -= FIELD_MARGIN_LEFT;
+    y -= FIELD_MARGIN_TOP;
+
     shader_use(shader);
+    
     shader_set_uniform_m4fv(shader, "u_projection", projection);
-    shader_set_uniform_2i(shader, "u_field_size", field->width, field->height);
-    shader_set_uniform_2i(shader, "u_field_pos", FIELD_X, FIELD_Y);
+    shader_set_uniform_2i(shader, "u_field_size", field->width,
+                          field->height);
+    shader_set_uniform_2i(shader, "u_field_pos", FIELD_MARGIN_LEFT,
+                          FIELD_MARGIN_TOP);
+    shader_set_uniform_2i(shader, "u_mouse_pos",
+                          (x > field->width) ? -1 : x,
+                          (y > field->height) ? -1 : y);
 
     texture_bind(resources_texture_atlas());
 

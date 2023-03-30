@@ -11,8 +11,8 @@ out VS_OUT {
 
 void main()
 {
-    float x = float(gl_VertexID % u_field_size.y);
-    float y = float(gl_VertexID / u_field_size.y);
+    float x = float(gl_VertexID % u_field_size.x);
+    float y = float(gl_VertexID / u_field_size.x);
     
     gl_Position = vec4(u_field_pos.x + x, u_field_pos.y + y, 0, 1);
 
