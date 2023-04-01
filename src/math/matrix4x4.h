@@ -8,22 +8,22 @@
 #define MATRIX4X4_WIDTH     4
 #define MATRIX4X4_SIZE      MATRIX4X4_WIDTH * MATRIX4X4_WIDTH
 
-typedef f32 *m4x4;
+typedef f32 *mat4;
 
-static inline void matrix4x4_set(m4x4 matrix, u8 i, u8 j, f32 value)
+static inline void matrix4x4_set(mat4 matrix, u8 i, u8 j, f32 value)
 {
     matrix[MATRIX4X4_WIDTH * i + j] = value;
 }
 
-static inline f32 matrix4x4_get(m4x4 matrix, u8 i, u8 j)
+static inline f32 matrix4x4_get(mat4 matrix, u8 i, u8 j)
 {
     return matrix[MATRIX4X4_WIDTH * i + j];
 }
 
-static m4x4 matrix4x4_allocate(bool unit)
+static mat4 matrix4x4_allocate(bool unit)
 {
     usize i;
-    m4x4 tmp = calloc(MATRIX4X4_SIZE, sizeof *tmp);
+    mat4 tmp = calloc(MATRIX4X4_SIZE, sizeof *tmp);
 
     if (unit) {
         for (i = 0; i < MATRIX4X4_WIDTH; i++) {
@@ -34,7 +34,7 @@ static m4x4 matrix4x4_allocate(bool unit)
     return tmp;
 }
 
-static void matrix4x4_free(m4x4 matrix)
+static void matrix4x4_free(mat4 matrix)
 {
     free(matrix);
 }

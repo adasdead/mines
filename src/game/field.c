@@ -10,38 +10,15 @@
 
 #include "definitions.h"
 
-static usize field_get_adjacent_mines(const struct field *field,
-                                      u32 x, u32 y)
+field_t field_create(u32 width, u32 height, u32 mines)
 {
-    usize mines = 0;
-    i32 off_x, off_y;
-
-    for (off_x = -1; off_x <= 1; off_x++) {
-        for (off_y = -1; off_y <= 1; off_y++) {
-            if (off_x == 0 && off_y == 0) {
-                continue;
-            }
-            
-            union cell *cell = field_cell(field, x + off_x, y + off_y);
-
-            if (cell != NULL) {
-                mines += (cell->type == CELL_TYPE_BOMB);
-            }
-        }
-    }
-
-    return mines;
-}
-
-struct field *field_create(u32 width, u32 height, u32 mines)
-{
-    struct field *field = malloc(sizeof *field);
+    field_t field = malloc(sizeof *field);
 
     if (field != NULL) {
         field->height = height;
         field->width = width;
         field->mines = mines;
-
+        field->size = width * height;
         field->cells = calloc(width * height, sizeof *(field->cells));
 
         glGenBuffers(1, &field->render.VBO);
@@ -67,7 +44,7 @@ ret:
     return field;
 }
 
-union cell *field_cell(const struct field *field, i32 x, i32 y)
+cell_t field_cell(field_t field, i32 x, i32 y)
 {
     if (field != NULL) {
         if (x >= field->width  || x < 0 ||
@@ -83,8 +60,9 @@ union cell *field_cell(const struct field *field, i32 x, i32 y)
     return NULL;
 }
 
-void field_generate(const struct field *field, u32 x, u32 y)
+void field_generate(field_t field, u32 x, u32 y)
 {
+    cell_t cell;
     usize placed_mines = 0;
     u32 rnd_x, rnd_y;
 
@@ -93,7 +71,7 @@ void field_generate(const struct field *field, u32 x, u32 y)
         return;
     }
 
-    memset(field->cells, 0, field->width * field->height * sizeof(u8));
+    memset(field->cells, 0, field->size * sizeof(u8));
 
     while (placed_mines != field->mines) {
         rnd_x = rand() % field->width;
@@ -103,7 +81,7 @@ void field_generate(const struct field *field, u32 x, u32 y)
             continue;
         }
 
-        union cell *cell = field_cell(field, rnd_x, rnd_y);
+        cell = field_cell(field, rnd_x, rnd_y);
 
         if (cell->type != CELL_TYPE_BOMB) {
             cell->type = CELL_TYPE_BOMB;
@@ -113,10 +91,10 @@ void field_generate(const struct field *field, u32 x, u32 y)
 
     for (x = 0; x < field->width; x++) {
         for (y = 0; y < field->height; y++) {
-            union cell *cell = field_cell(field, x, y);
+            cell = field_cell(field, x, y);
 
             if (cell->type != CELL_TYPE_BOMB) {
-                cell->type = field_get_adjacent_mines(field, x, y);
+                cell->type = field_adjacent_mines(field, x, y);
             }
         }
     }
@@ -125,36 +103,50 @@ void field_generate(const struct field *field, u32 x, u32 y)
                 field->width, field->height, field->mines);
 }
 
-void field_render(const struct field *field, m4x4 projection)
+usize field_adjacent_mines(field_t field, u32 x, u32 y)
 {
-    i32 x, y;
+    cell_t cell;
+    usize mines = 0;
+    i32 off_x, off_y;
+
+    for (off_x = -1; off_x <= 1; off_x++) {
+        for (off_y = -1; off_y <= 1; off_y++) {
+            if (off_x == 0 && off_y == 0) {
+                continue;
+            }
+            
+            cell = field_cell(field, x + off_x, y + off_y);
+
+            if (cell != NULL) {
+                mines += (cell->type == CELL_TYPE_BOMB);
+            }
+        }
+    }
+
+    return mines;
+}
+
+void field_render(field_t field, mat4 projection, i32 mouse_x, i32 mouse_y)
+{
     shader_t shader = resources_shader(RS_SHADER_FIELD);
-    usize size = field->width * field->height * sizeof(u8);
 
-    window_mouse_pos(&x, &y);
-
-    x -= FIELD_MARGIN_LEFT;
-    y -= FIELD_MARGIN_TOP;
+    field_normalize_mouse_pos(field, mouse_x, mouse_y);
 
     shader_use(shader);
-    
+
     shader_set_uniform_m4fv(shader, "u_projection", projection);
-    shader_set_uniform_2i(shader, "u_field_size", field->width,
-                          field->height);
-    shader_set_uniform_2i(shader, "u_field_pos", FIELD_MARGIN_LEFT,
-                          FIELD_MARGIN_TOP);
-    shader_set_uniform_2i(shader, "u_mouse_pos",
-                          (x > field->width) ? -1 : x,
-                          (y > field->height) ? -1 : y);
+    shader_set_uniform_2i(shader, "u_field_size", field->width, field->height);
+    shader_set_uniform_2i(shader, "u_field_pos", FIELD_LX, FIELD_LY);
+    shader_set_uniform_2i(shader, "u_mouse_pos", mouse_x, mouse_y);
 
     texture_bind(resources_texture_atlas());
 
     glBindBuffer(GL_ARRAY_BUFFER, field->render.VBO);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, size, field->cells);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, field->size * sizeof(u8), field->cells);
     glBindBuffer(GL_ARRAY_BUFFER, GL_NONE);
 
     glBindVertexArray(field->render.VAO);
-    glDrawArrays(GL_POINTS, 0, size);
+    glDrawArrays(GL_POINTS, 0, field->size);
     glBindVertexArray(GL_NONE);
 }
 

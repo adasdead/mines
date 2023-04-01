@@ -15,15 +15,17 @@ target_sources(${PROJECT_NAME} PRIVATE
     game/game.c
     game/window.c
     game/field.c
+    game/smile.c
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE
-    .
+    ${PROJECT_SOURCE_DIR}
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
-                          COMPILE_OPTIONS "-fanalyzer"
-                          EXCLUDE_FROM_DEFAULT_BUILD true)
+    COMPILE_OPTIONS "-fanalyzer"
+    EXCLUDE_FROM_DEFAULT_BUILD true
+)
 
 
 target_link_libraries(${PROJECT_NAME}
@@ -32,4 +34,9 @@ target_link_libraries(${PROJECT_NAME}
     OpenGL::GL
     glfw
     m
+)
+
+add_custom_command(TARGET ${PROJECT_NAME}
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    ${PROJECT_ASSETS_DIR} $<TARGET_FILE_DIR:${PROJECT_NAME}>/assets
 )

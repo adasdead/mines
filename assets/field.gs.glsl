@@ -5,10 +5,13 @@ uniform ivec2 u_field_pos;
 
 in VS_OUT {
     uint tile;
+    int cell_opened;
 } gs_in[];
 
 out vec2 tex_coord;
 out vec2 cell_pos;
+
+flat out int cell_opened;
 
 const float TILE_SIZE = 16.0;
 
@@ -21,6 +24,7 @@ void main() {
     vec4 pos = gl_in[0].gl_Position;
 
     cell_pos = vec2(pos.x, pos.y) - u_field_pos;
+    cell_opened = gs_in[0].cell_opened;
 
     gl_Position = u_projection * pos;
     tex_coord = vec2(x, TILE_SIZE);

@@ -7,6 +7,7 @@ layout (location = 0) in uint tile;
 
 out VS_OUT {
     uint tile;
+    int cell_opened;
 } vs_out;
 
 void main()
@@ -16,12 +17,15 @@ void main()
     
     gl_Position = vec4(u_field_pos.x + x, u_field_pos.y + y, 0, 1);
 
+    vs_out.cell_opened = 0;
+
     switch ((tile >> 4u)) {
         case 0u:                            /* CELL_STATE_CLOSED */
             vs_out.tile = 12u;
             break;
         case 1u:                            /* CELL_STATE_OPENED */
             vs_out.tile = tile & 15u;
+            vs_out.cell_opened = 1;
             break;
         case 2u:                            /* CELL_STATE_FLAGGED */
             vs_out.tile = 14u;

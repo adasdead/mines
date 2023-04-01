@@ -13,6 +13,6 @@ void window_free(void);
 
 double window_factor(void);
 GLFWwindow *window_glfw(void);
-m4x4 window_projection(void);
+mat4 window_projection(void);
 
 #endif /* GAME_WINDOW_H */

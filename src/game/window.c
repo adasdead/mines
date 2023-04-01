@@ -5,7 +5,7 @@
 #include "definitions.h"
 
 static GLFWwindow *window;
-static m4x4 projection;
+static mat4 projection;
 static double factor;
 
 static double window_scale_factor(void)
@@ -38,8 +38,8 @@ void window_init(void)
 void window_resize(u32 width, u32 height)
 {
     factor = window_scale_factor();
-    u32 win_width = CELL_WIDTH * factor * width;
-    u32 win_height = CELL_WIDTH * factor * height;
+    u32 win_width = CELL_WIDTH_PX * factor * width;
+    u32 win_height = CELL_WIDTH_PX * factor * height;
 
     glfwSetWindowSize(window_glfw(), win_width, win_height);
     glViewport(0, 0, win_width, win_height);
@@ -56,8 +56,8 @@ void window_mouse_pos(i32 *x, i32 *y)
     
     glfwGetCursorPos(window_glfw(), &xpos, &ypos);
 
-    *x = (i32) xpos / CELL_WIDTH / factor;
-    *y = (i32) ypos / CELL_WIDTH / factor;
+    *x = (i32) xpos / CELL_WIDTH_PX / factor;
+    *y = (i32) ypos / CELL_WIDTH_PX / factor;
 }
 
 void window_free(void)
@@ -76,7 +76,7 @@ GLFWwindow *window_glfw(void)
     return window;
 }
 
-m4x4 window_projection(void)
+mat4 window_projection(void)
 {
     return projection;
 }

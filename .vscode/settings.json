@@ -6,6 +6,11 @@
         "logger.h": "c",
         "resources.h": "c",
         "cell.h": "c",
-        "numbers": "c"
+        "numbers": "c",
+        "array": "c",
+        "string_view": "c",
+        "initializer_list": "c",
+        "matrix4x4.h": "c",
+        "definitions.h": "c"
     }
 }

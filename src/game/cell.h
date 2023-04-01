@@ -33,4 +33,6 @@ union cell {
     };
 };
 
+typedef union cell *cell_t;
+
 #endif /* GAME_CELL_H */

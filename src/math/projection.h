@@ -3,10 +3,10 @@
 
 #include "math/matrix4x4.h"
 
-static m4x4 projection_ortho(f32 left, f32 right, f32 bottom, f32 top,
+static mat4 projection_ortho(f32 left, f32 right, f32 bottom, f32 top,
                              f32 near, f32 far)
 {
-    m4x4 matrix = matrix4x4_allocate(true);
+    mat4 matrix = matrix4x4_allocate(true);
 
     matrix4x4_set(matrix, 0, 0, 2.0f / (right - left));
     matrix4x4_set(matrix, 1, 1, 2.0f / (top - bottom));

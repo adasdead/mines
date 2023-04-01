@@ -7,7 +7,14 @@
 
 #include "cell.h"
 
+#define field_normalize_mouse_pos(field, x, y)                          \
+    do {                                                                \
+        x = (x - FIELD_LX >= field->width) ? -1 :  x - FIELD_LX;        \
+        y = (y - FIELD_LY >= field->height) ? -1 : y - FIELD_LY;        \
+    } while (0)
+
 struct field {
+    usize size;
     u32 width, height;
     u32 mines;
 
@@ -18,10 +25,13 @@ struct field {
     } render;
 };
 
-struct field *field_create(u32 width, u32 height, u32 mines);
-union cell *field_cell(const struct field *field, i32 x, i32 y);
-void field_generate(const struct field *field, u32 x, u32 y);
-void field_render(const struct field *field, m4x4 projection);
-void field_free(struct field *field);
+typedef struct field *field_t;
+
+field_t field_create(u32 width, u32 height, u32 mines);
+cell_t field_cell(field_t field, i32 x, i32 y);
+void field_generate(field_t field, u32 x, u32 y);
+usize field_adjacent_mines(field_t field, u32 x, u32 y);
+void field_render(field_t field, mat4 projection, i32 mouse_x, i32 mouse_y);
+void field_free(field_t field);
 
 #endif /* GAME_FIELD_H */

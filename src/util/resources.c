@@ -1,15 +1,17 @@
 #include "resources.h"
 
+#include "definitions.h"
+
 static struct texture *texture_atlas;
 static shader_t shaders[RS_SHADER_TOTAL];
 
 void resources_load(void)
 {
-    texture_atlas = texture_load("atlas.png");
+    texture_atlas = texture_load(ASSETS_DIR"atlas.png");
 
-    shaders[RS_SHADER_FIELD] = shader_load_g("field.vs.glsl",
-                                             "field.fs.glsl",
-                                             "field.gs.glsl");
+    shaders[RS_SHADER_FIELD] = shader_load_g(ASSETS_DIR"field.vs.glsl",
+                                             ASSETS_DIR"field.fs.glsl",
+                                             ASSETS_DIR"field.gs.glsl");
 }
 
 struct texture *resources_texture_atlas(void)

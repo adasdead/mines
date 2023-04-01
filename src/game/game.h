@@ -4,15 +4,10 @@
 #include "math/matrix4x4.h"
 #include "util/basic_types.h"
 
-enum game_difficulty {
-    GAME_DIF_BEGGINER,
-    GAME_DIF_INTERMEDIATE,
-    GAME_DIF_EXPERT,
-    GAME_DIF_TOTAL,
-};
-
-void game_start(void);
-void game_loop(m4x4 projection);
+void game_init(void);
+void game_loop(void);
+void game_on_left_click(i32 x, i32 y, bool press);
+void game_on_right_click(i32 x, i32 y, bool press);
 void game_toggle_difficulty(void);
 void game_free(void);
 
