@@ -1,7 +1,7 @@
 find_package(OpenGL REQUIRED)
 find_package(glfw3 REQUIRED)
 
-add_executable(${PROJECT_NAME} WIN32 main.c)
+add_executable(${PROJECT_NAME}  main.c)
 
 target_sources(${PROJECT_NAME} PRIVATE
     glad/glad.c

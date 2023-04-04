@@ -12,6 +12,9 @@ void resources_load(void)
     shaders[RS_SHADER_FIELD] = shader_load_g(ASSETS_DIR"field.vs.glsl",
                                              ASSETS_DIR"field.fs.glsl",
                                              ASSETS_DIR"field.gs.glsl");
+
+    shaders[RS_SHADER_SMILE] = shader_load(ASSETS_DIR"smile.vs.glsl",
+                                           ASSETS_DIR"smile.fs.glsl");
 }
 
 struct texture *resources_texture_atlas(void)

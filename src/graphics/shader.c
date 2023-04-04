@@ -124,6 +124,11 @@ void shader_set_uniform_2i(shader_t shader, const char *name, i32 x, i32 y)
     glUniform2i(glGetUniformLocation(shader, name), x, y);
 }
 
+void shader_set_uniform_2f(shader_t shader, const char *name, f32 x, f32 y)
+{
+    glUniform2f(glGetUniformLocation(shader, name), x, y);
+}
+
 void shader_set_uniform_m4fv(shader_t shader, const char *name, mat4 matrix)
 {
     glUniformMatrix4fv(glGetUniformLocation(shader, name), 1, GL_FALSE,

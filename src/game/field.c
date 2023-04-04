@@ -33,7 +33,7 @@ field_t field_create(u32 width, u32 height, u32 mines)
         glBindBuffer(GL_ARRAY_BUFFER, GL_NONE);
         glBindVertexArray(GL_NONE);
 
-        logger_info("Field(%zux%zu | %zu mines) created!", width,
+        logger_info("Field(%ux%u | %u mines) created!", width,
                     height, mines);
     }
     else {
@@ -71,8 +71,6 @@ void field_generate(field_t field, u32 x, u32 y)
         return;
     }
 
-    memset(field->cells, 0, field->size * sizeof(u8));
-
     while (placed_mines != field->mines) {
         rnd_x = rand() % field->width;
         rnd_y = rand() % field->height;
@@ -99,7 +97,7 @@ void field_generate(field_t field, u32 x, u32 y)
         }
     }
 
-    logger_info("Field(%zux%zu | %zu mines) generated",
+    logger_info("Field(%ux%u | %u mines) generated",
                 field->width, field->height, field->mines);
 }
 

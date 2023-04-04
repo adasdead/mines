@@ -1,14 +1,19 @@
 #ifndef GAME_FIELD_H
 #define GAME_FIELD_H
 
+#include "game/window.h"
+
 #include "graphics/opengl.h"
+
 #include "math/matrix4x4.h"
+
 #include "util/basic_types.h"
 
 #include "cell.h"
 
 #define field_normalize_mouse_pos(field, x, y)                          \
     do {                                                                \
+        window_normalize_mouse_pos(&x, &y);                             \
         x = (x - FIELD_LX >= field->width) ? -1 :  x - FIELD_LX;        \
         y = (y - FIELD_LY >= field->height) ? -1 : y - FIELD_LY;        \
     } while (0)

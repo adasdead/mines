@@ -15,6 +15,8 @@
 #define FIELD_RY                1
 #define FIELD_RX                FIELD_RY
 
+#define SMILE_Y                 1
+
 #define CELL_WIDTH_PX           16
 
 #endif /* DEFINITIONS_H */

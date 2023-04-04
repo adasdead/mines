@@ -30,9 +30,9 @@ static void on_key_callback(GLFWwindow* window, int key, int scancode,
 void on_mouse_click_callback(GLFWwindow* window, int button,
                              int action, int mods)
 {
-    i32 x, y;
+    double x, y;
 
-    window_mouse_pos(&x, &y);
+    glfwGetCursorPos(window_glfw(), &x, &y);
 
     switch (button) {
     case GLFW_MOUSE_BUTTON_RIGHT:
@@ -64,6 +64,8 @@ static void init(void)
     glfwSetKeyCallback(window_glfw(), on_key_callback);
     glfwSetMouseButtonCallback(window_glfw(),
                                on_mouse_click_callback);
+
+    glfwSwapInterval(1);
 }
 
 int main(void)
@@ -73,7 +75,7 @@ int main(void)
     game_init();
 
     while (!glfwWindowShouldClose(window_glfw())) {
-        glfwWaitEvents();
+        glfwPollEvents();
         
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
