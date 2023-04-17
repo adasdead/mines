@@ -17,6 +17,8 @@
 
 #define SMILE_Y                 1
 
+#define COUNTER_Y               1
+
 #define CELL_WIDTH_PX           16
 
 #endif /* DEFINITIONS_H */

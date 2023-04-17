@@ -11,24 +11,18 @@
 
 #include "definitions.h"
 
-static GLfloat smile_vertices[] = {
-    0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
-    0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f,
-};
+#define SMILE_OFFSET                                        0.15f
+#define SMILE_SCALE_FACTOR                                  1.655f
 
 static bool check_cursor_on_smile(smile_t smile, u32 x, u32 y)
 {
-    float cell_width_px = window_factor() * CELL_WIDTH_PX;
-    float left = (smile->x + 0.15f) * cell_width_px;
-    float top = (SMILE_Y + 0.15f) * cell_width_px;
-    float offset = 1.65f * cell_width_px;
+    f32 cell_width_px = window_factor() * CELL_WIDTH_PX;
+    f32 left = (smile->x + SMILE_OFFSET) * cell_width_px;
+    f32 top = (SMILE_Y + SMILE_OFFSET) * cell_width_px;
+    f32 offset = SMILE_SCALE_FACTOR * cell_width_px;
 
-    if (y <= top) return false;
-    if (y >= top + offset) return false;
-    if (x <= left) return false;
-    if (x >= left + offset) return false;
-
-    return true;
+    return !(y <= top) && !(y >= top + offset) &&
+           !(x <= left) && !(x >= left + offset);
 }
 
 smile_t smile_create(enum smile_state state)
@@ -37,19 +31,20 @@ smile_t smile_create(enum smile_state state)
 
     if (smile != NULL) {
         smile->state = state;
+        smile->model = matrix4x4_allocate(false);
 
         glGenVertexArrays(1, &smile->render.VAO);
         glGenBuffers(1, &smile->render.VBO);
 
         glBindBuffer(GL_ARRAY_BUFFER, smile->render.VBO);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(smile_vertices),
-                     smile_vertices, GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(OPENGL_BASIC_VERTICES),
+                     OPENGL_BASIC_VERTICES, GL_STATIC_DRAW);
 
         glBindVertexArray(smile->render.VAO);
 
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE,
-                              2 * sizeof *smile_vertices, NULL);
+                              2 * sizeof *OPENGL_BASIC_VERTICES, NULL);
 
         glBindBuffer(GL_ARRAY_BUFFER, GL_NONE);
         glBindVertexArray(GL_NONE);
@@ -62,9 +57,15 @@ smile_t smile_create(enum smile_state state)
     return smile;
 }
 
-void smile_set_field_width(smile_t smile, u32 field_width)
+void smile_update_width(smile_t smile, u32 field_width)
 {
     smile->x = ((FIELD_LX + FIELD_RX + field_width) / 2.0f) - 1.0f;
+
+    matrix4x4_free(smile->model);
+    smile->model = matrix4x4_allocate(true);
+    matrix4x4_scale(smile->model, SMILE_SCALE_FACTOR, SMILE_SCALE_FACTOR);
+    matrix4x4_translate(smile->model, smile->x + SMILE_OFFSET,
+                        SMILE_Y + SMILE_OFFSET);
 }
 
 void smile_render(const smile_t smile, mat4 projection)
@@ -73,13 +74,13 @@ void smile_render(const smile_t smile, mat4 projection)
 
     shader_use(shader);
     shader_set_uniform_m4fv(shader, "u_projection", projection);
-    shader_set_uniform_2f(shader, "u_smile_pos", smile->x, SMILE_Y);
+    shader_set_uniform_m4fv(shader, "u_model", smile->model);
     shader_set_uniform_1i(shader, "u_smile_state", smile->state);
 
     texture_bind(resources_texture_atlas());
 
     glBindVertexArray(smile->render.VAO);
-    glDrawArrays(GL_TRIANGLES, 0, 6);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 5);
     glBindVertexArray(0);
 }
 

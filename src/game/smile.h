@@ -19,6 +19,7 @@ enum smile_state {
 struct smile {
     f32 x;
     enum smile_state state;
+    mat4 model;
 
     struct {
         GLuint VAO, VBO;
@@ -28,7 +29,7 @@ struct smile {
 typedef struct smile *smile_t;
 
 smile_t smile_create(enum smile_state state);
-void smile_set_field_width(smile_t smile, u32 field_width);
+void smile_update_width(smile_t smile, u32 field_width);
 void smile_render(const smile_t smile, mat4 projection);
 void smile_mouse(smile_t smile, u32 x, u32 y, bool press);
 void smile_free(smile_t smile);

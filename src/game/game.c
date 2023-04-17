@@ -1,8 +1,12 @@
 #include "game/game.h"
 
+#include <time.h>
+
 #include "game/window.h"
 #include "game/field.h"
 #include "game/smile.h"
+#include "game/difficulty.h"
+#include "game/counter.h"
 
 #include "util/logger.h"
 
@@ -15,24 +19,18 @@ enum game_state {
     GAME_STATE_WON
 };
 
-struct game_difficulty_info {
-    usize id;
-    const char name[32];
-    u32 field_width, field_height;
-    usize mines_count;
-
-} *cur_difficulty = NULL;
-
-static struct game_difficulty_info game_difficulties[] = {
-    { 0,    "BEGGINER",          9,      9,    10 },
-    { 1,    "INTERMEDIATE",     16,     16,    40 },
-    { 2,    "EXPERT",           30,     16,    99 }
-};
-
 static enum game_state state = GAME_STATE_IDLE;
+
+static game_difficulty_t cur_difficulty = NULL;
+
 static usize opened_cells = 0;
+static time_t start_time;
+
+/* objects */
 static field_t field = NULL;
 static smile_t smile = NULL;
+static counter_t mine_counter = NULL;
+static counter_t time_counter = NULL;
 
 static void check_lose(cell_t cell)
 {
@@ -58,9 +56,9 @@ static void check_lose(cell_t cell)
             }
         }
 
-        state = GAME_STATE_LOSE;
         smile->state = SMILE_STATE_DEAD;
-
+        state = GAME_STATE_LOSE;
+        
         logger_info("Lose");
     }
 }
@@ -83,8 +81,8 @@ static void check_won(void)
             }
         }
 
-        state = GAME_STATE_WON;
         smile->state = SMILE_STATE_COOL;
+        state = GAME_STATE_WON;
 
         logger_info("Won");
     }
@@ -130,8 +128,13 @@ void game_new(void)
 
     window_resize(width + field->width, height + field->height);
 
-    smile_set_field_width(smile, field->width);
+    smile_update_width(smile, field->width);
     smile->state = SMILE_STATE_DEFAULT;
+
+    mine_counter->value = field->mines;
+    time_counter->value = 0;
+
+    counter_update_x(time_counter, field->width - 2);
 
     state = GAME_STATE_IDLE;
     opened_cells = 0;
@@ -140,6 +143,9 @@ void game_new(void)
 void game_init(void)
 {
     smile = smile_create(SMILE_STATE_DEFAULT);
+    mine_counter = counter_create();
+    counter_update_x(mine_counter, 1);
+    time_counter = counter_create();
     game_toggle_difficulty();
 }
 
@@ -151,8 +157,14 @@ void game_loop(void)
 
     glfwGetCursorPos(window_glfw(), &mouse_x, &mouse_y);
 
+    if (state == GAME_STATE_STARTED) {
+        time_counter->value = time(NULL) - start_time;
+    }
+
     field_render(field, projection, mouse_x, mouse_y);
     smile_render(smile, projection);
+    counter_render(mine_counter, projection);
+    counter_render(time_counter, projection);
 }
 
 void game_on_left_click(i32 x, i32 y, bool press)
@@ -166,6 +178,7 @@ void game_on_left_click(i32 x, i32 y, bool press)
     if (press && state != GAME_STATE_LOSE) {
         if (state == GAME_STATE_IDLE) {
             field_generate(field, x, y);
+            start_time = time(NULL);
             state = GAME_STATE_STARTED;
         }
 
@@ -182,15 +195,19 @@ void game_on_right_click(i32 x, i32 y, bool press)
 
     field_normalize_mouse_pos(field, x, y);
 
+    if (x < 0 || y < 0) return;
+
     if (press) {
         cell = field_cell(field, x, y);
 
         switch (cell->state) {
         case CELL_STATE_CLOSED:
             cell->state = CELL_STATE_FLAGGED;
+            mine_counter->value -= 1;
             return;
         case CELL_STATE_FLAGGED:
             cell->state = CELL_STATE_QUESTIONED;
+            mine_counter->value += 1;
             return;
         case CELL_STATE_QUESTIONED:
             cell->state = CELL_STATE_CLOSED;
@@ -219,4 +236,6 @@ void game_free(void)
 {
     field_free(field);
     smile_free(smile);
+    counter_free(mine_counter);
+    counter_free(time_counter);
 }

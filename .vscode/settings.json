@@ -11,6 +11,10 @@
         "string_view": "c",
         "initializer_list": "c",
         "matrix4x4.h": "c",
-        "definitions.h": "c"
+        "definitions.h": "c",
+        "field.h": "c",
+        "smile.h": "c",
+        "difficulty.h": "c",
+        "window.h": "c"
     }
 }

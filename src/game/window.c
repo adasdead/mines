@@ -1,11 +1,13 @@
 #include "window.h"
 
+#include "game/difficulty.h"
+
 #include "util/logger.h"
 
 #include "definitions.h"
 
-static GLFWwindow *window;
 static mat4 projection;
+static GLFWwindow *window;
 static double factor = 0.0;
 
 static double window_scale_factor(void)
@@ -21,8 +23,11 @@ static double window_scale_factor(void)
 
 void window_init(void)
 {
-    u32 win_width = CELL_WIDTH_PX * 11 * window_scale_factor();
-    u32 win_height = CELL_WIDTH_PX * 14 * window_scale_factor();
+    game_difficulty_t dif = &game_difficulties[0];
+    u32 width = dif->field_width + FIELD_LX + FIELD_RX;
+    u32 height = dif->field_height + FIELD_LY + FIELD_RY;
+    u32 win_width = CELL_WIDTH_PX * width * window_scale_factor();
+    u32 win_height = CELL_WIDTH_PX * height * window_scale_factor();
 
     glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
@@ -38,8 +43,7 @@ void window_init(void)
 
     projection = matrix4x4_allocate(false);
 
-    logger_info("Window created(%dx%d)", WINDOW_BASE_WIDTH,
-                WINDOW_BASE_HEIGHT);
+    logger_info("Window created(%dx%d)", win_width, win_height);
 }
 
 void window_resize(u32 width, u32 height)
@@ -52,8 +56,9 @@ void window_resize(u32 width, u32 height)
 
     matrix4x4_free(projection);
     
-    projection = projection_ortho(0.0f, width, height,
-                                  0.0f, -1.0f, 1.0f);
+    projection = matrix4x4_ortho(0.0f, width, height, 0.0f, -1.0f, 1.0f);
+
+    logger_info("Window resized(%dx%d)", win_width, win_height);
 }
 
 void window_normalize_mouse_pos(i32 *x, i32 *y)

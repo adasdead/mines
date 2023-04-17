@@ -7,6 +7,7 @@
 enum resources_shader_type {
     RS_SHADER_FIELD,
     RS_SHADER_SMILE,
+    RS_SHADER_COUNTER,
     RS_SHADER_TOTAL
 };
 
