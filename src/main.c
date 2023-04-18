@@ -30,9 +30,9 @@ static void on_key_callback(GLFWwindow* window, int key, int scancode,
 void on_mouse_click_callback(GLFWwindow* window, int button,
                              int action, int mods)
 {
-    double x, y;
+    int x, y;
 
-    glfwGetCursorPos(window_glfw(), &x, &y);
+    window_cursor_pos(&x, &y);
 
     switch (button) {
     case GLFW_MOUSE_BUTTON_RIGHT:

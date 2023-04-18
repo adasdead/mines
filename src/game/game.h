@@ -9,8 +9,8 @@ void game_new(void);
 void game_init(void);
 void game_loop(void);
 
-void game_on_left_click(i32 x, i32 y, bool press);
-void game_on_right_click(i32 x, i32 y, bool press);
+void game_on_left_click(int x, int y, bool press);
+void game_on_right_click(int x, int y, bool press);
 
 void game_toggle_difficulty(void);
 

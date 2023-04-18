@@ -10,7 +10,7 @@
 #define ANSI_GRN_BACKGROUND             "\033[0;102m"
 
 void logger_log(enum logger_level level, const char *file_name,
-                usize line_no,  const char *__restrict format, ...)
+                size_t line_no,  const char *__restrict format, ...)
 {
     const char *color, *status;
     va_list args_list;

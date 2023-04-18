@@ -24,6 +24,6 @@ enum logger_level {
 };
 
 void logger_log(enum logger_level level, const char *file_name,
-                usize line_no, const char *__restrict format, ...);
+                size_t line_no, const char *__restrict format, ...);
 
 #endif /* UTIL_LOGGER_H */

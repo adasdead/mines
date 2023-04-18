@@ -6,11 +6,13 @@
 
 #include "util/logger.h"
 
+/***************************************************************************/
+
 static char *read_strings_from_file(const char *file_path)
 {
     FILE *fp = fopen(file_path, "rb");
     char *buffer = NULL;
-    usize buffer_size;
+    size_t buffer_size;
 
     if (fp != NULL) {
         fseek(fp, 0, SEEK_END);
@@ -78,6 +80,8 @@ static GLuint shader_create(const char *file_path, GLenum type)
     return GL_NONE;
 }
 
+/***************************************************************************/
+
 shader_t shader_load_g(const char *vertex_path, const char *fragment_path,
                        const char *geometry_path)
 {
@@ -119,12 +123,12 @@ void shader_set_uniform_1i(shader_t shader, const char *name, int value)
     glUniform1i(glGetUniformLocation(shader, name), value);
 }
 
-void shader_set_uniform_2i(shader_t shader, const char *name, i32 x, i32 y)
+void shader_set_uniform_2i(shader_t shader, const char *name, int x, int y)
 {
     glUniform2i(glGetUniformLocation(shader, name), x, y);
 }
 
-void shader_set_uniform_2f(shader_t shader, const char *name, f32 x, f32 y)
+void shader_set_uniform_2f(shader_t shader, const char *name, float x, float y)
 {
     glUniform2f(glGetUniformLocation(shader, name), x, y);
 }

@@ -7,11 +7,30 @@
 
 #include "definitions.h"
 
-#define COUNTER_OFFSET                                      0.25f
-#define COUNTER_SCALE_FACTOR_X                              0.82f
-#define COUNTER_SCALE_FACTOR_Y                              1.465f
+#define OFFSET_X                                    0.25f
+#define OFFSET_Y                                    OFFSET_X
+#define SCALE_FACTOR_X                              0.82f
+#define SCALE_FACTOR_Y                              1.465f
+#define DEFAULT                                     1
 
-#define norm(x) ((x) < 999) ? (((x) > 0) ? (x) : 0) : 999
+/***************************************************************************/
+
+/* https://cp-algorithms.com/algebra/binary-exp.html#implementation */
+static long long binary_pow(long long n, long long x)
+{
+    long long result = 1;
+
+    while (x != 0) {
+        if(x & 1) result *= n;
+
+        n *= n;
+        x >>= 1;
+    }
+
+    return result;
+}
+
+/***************************************************************************/
 
 counter_t counter_create(void)
 {
@@ -19,6 +38,9 @@ counter_t counter_create(void)
 
     if (counter != NULL) {
         memset(counter, 0, sizeof *counter);
+
+        counter->models = calloc(COUNTER_NUMBERS,
+                                 sizeof *counter->models);
 
         glGenVertexArrays(1, &counter->render.VAO);
         glGenBuffers(1, &counter->render.VBO);
@@ -36,7 +58,7 @@ counter_t counter_create(void)
         glBindBuffer(GL_ARRAY_BUFFER, GL_NONE);
         glBindVertexArray(GL_NONE);
 
-        counter_update_x(counter, 0);
+        counter_update_x(counter, DEFAULT);
     }
     else {
         logger_fatal("Failed to allocate memory for counter");
@@ -45,54 +67,56 @@ counter_t counter_create(void)
     return counter;
 }
 
-void counter_update_x(counter_t counter, u32 x)
+void counter_update_x(counter_t counter, uint x)
 {
-    i32 i;
+    int i;
+    float tx;
 
-    for (i = 0; i < 3; i++) {
+    for (i = 0; i < COUNTER_NUMBERS; ++i) {
+        tx = x + OFFSET_X + i * SCALE_FACTOR_X;
         matrix4x4_free(counter->models[i]);
         counter->models[i] = matrix4x4_allocate(true);
-        matrix4x4_scale(counter->models[i], COUNTER_SCALE_FACTOR_X,
-                        COUNTER_SCALE_FACTOR_Y);
-        matrix4x4_translate(counter->models[i],
-                            x + COUNTER_OFFSET + i * COUNTER_SCALE_FACTOR_X,
-                            COUNTER_Y + COUNTER_OFFSET);
+        matrix4x4_scale(counter->models[i], SCALE_FACTOR_X, SCALE_FACTOR_Y);
+        matrix4x4_translate(counter->models[i], tx, COUNTER_Y + OFFSET_Y);
     }
 }
 
 void counter_render(const counter_t counter, mat4 projection)
 {
-    shader_t shader = resources_shader(RS_SHADER_COUNTER);
+    int i, p, n = binary_pow(10, COUNTER_NUMBERS) - 1;
+    shader_t shader;
 
-    shader_use(shader);
+    shader_use(shader = resources_shader(RS_SHADER_COUNTER));
     shader_set_uniform_m4fv(shader, "u_projection", projection);
 
     texture_bind(resources_texture_atlas());
 
     glBindVertexArray(counter->render.VAO);
 
-    shader_set_uniform_m4fv(shader, "u_model", counter->models[0]);
-    shader_set_uniform_1i(shader, "u_number", norm(counter->value / 100 % 10));
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 5);
+    if (n > counter->value) n = counter->value;
+    if (0 > counter->value) n = 0;
 
-    shader_set_uniform_m4fv(shader, "u_model", counter->models[1]);
-    shader_set_uniform_1i(shader, "u_number", norm(counter->value / 10 % 10));
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 5);
+    for (int i = 0; i < COUNTER_NUMBERS; ++i) {
+        p = binary_pow(10, (COUNTER_NUMBERS - 1) - i);
 
-    shader_set_uniform_m4fv(shader, "u_model", counter->models[2]);
-    shader_set_uniform_1i(shader, "u_number", norm(counter->value % 10));
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 5);
+        shader_set_uniform_m4fv(shader, "u_model", counter->models[i]);
+        shader_set_uniform_1i(shader, "u_number", n / p % 10);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 5);
+    }
 
     glBindVertexArray(0);
 }
 
 void counter_free(counter_t counter)
 {
-    if (counter != NULL) {
-        matrix4x4_free(counter->models[0]);
-        matrix4x4_free(counter->models[1]);
-        matrix4x4_free(counter->models[2]);
+    size_t i;
 
+    if (counter != NULL) {
+        for (i = 0; i < COUNTER_NUMBERS; ++i) {
+            matrix4x4_free(counter->models[i]);
+        }
+
+        free(counter->models);
         free(counter);
     }
 }

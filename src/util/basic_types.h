@@ -5,13 +5,7 @@
 #include <float.h>
 #include <stdbool.h>
 
-typedef uint8_t     u8;
-typedef int8_t      i8;
-typedef int32_t     i32;
-typedef uint32_t    u32;
-
-typedef uint64_t    usize;
-
-typedef float       f32;
+typedef uint8_t     byte;
+typedef uint32_t    uint;
 
 #endif /* UTIL_BASIC_TYPES_H */

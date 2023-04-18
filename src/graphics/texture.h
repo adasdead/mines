@@ -3,11 +3,10 @@
 
 #include "graphics/opengl.h"
 
-#include "util/basic_types.h"
-
 struct texture {
-    GLuint  id;
-    i32     width, height;
+    GLuint              id;
+    int                 width;
+    int                 height;
 };
 
 struct texture *texture_load(const char *file_path);

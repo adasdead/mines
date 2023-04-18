@@ -10,7 +10,7 @@
 
 #include "definitions.h"
 
-field_t field_create(u32 width, u32 height, u32 mines)
+field_t field_create(uint width, uint height, uint mines)
 {
     field_t field = malloc(sizeof *field);
 
@@ -29,7 +29,7 @@ field_t field_create(u32 width, u32 height, u32 mines)
 
         glBindVertexArray(field->render.VAO);
         glEnableVertexAttribArray(0);
-        glVertexAttribIPointer(0, 1, GL_UNSIGNED_BYTE, sizeof(u8), NULL);
+        glVertexAttribIPointer(0, 1, GL_UNSIGNED_BYTE, sizeof(uint8_t), NULL);
         glBindBuffer(GL_ARRAY_BUFFER, GL_NONE);
         glBindVertexArray(GL_NONE);
 
@@ -40,11 +40,19 @@ field_t field_create(u32 width, u32 height, u32 mines)
         logger_fatal("Failed to allocate memory for field");
     }
 
-ret:
     return field;
 }
 
-cell_t field_cell(field_t field, i32 x, i32 y)
+bool field_normalize_pos(const field_t field, int *x, int *y)
+{
+    *x = ((int) (*x / CELL_WIDTH_PX / window_scale_factor())) - FIELD_LX;
+    *y = ((int) (*y / CELL_WIDTH_PX / window_scale_factor())) - FIELD_LY;
+
+    return (*x < field->width) && (*y < field->height) &&
+           (*x >= 0)           && (*y >= 0);
+}
+
+cell_t field_cell(field_t field, int x, int y)
 {
     if (field != NULL) {
         if (x >= field->width  || x < 0 ||
@@ -60,11 +68,11 @@ cell_t field_cell(field_t field, i32 x, i32 y)
     return NULL;
 }
 
-void field_generate(field_t field, u32 x, u32 y)
+void field_generate(field_t field, uint x, uint y)
 {
     cell_t cell;
-    usize placed_mines = 0;
-    u32 rnd_x, rnd_y;
+    size_t placed_mines = 0;
+    uint rnd_x, rnd_y;
 
     if (field == NULL) {
         logger_warn("field is NULL (field_generate)");
@@ -87,8 +95,8 @@ void field_generate(field_t field, u32 x, u32 y)
         }
     }
 
-    for (x = 0; x < field->width; x++) {
-        for (y = 0; y < field->height; y++) {
+    for (x = 0; x < field->width; ++x) {
+        for (y = 0; y < field->height; ++y) {
             cell = field_cell(field, x, y);
 
             if (cell->type != CELL_TYPE_BOMB) {
@@ -101,14 +109,14 @@ void field_generate(field_t field, u32 x, u32 y)
                 field->width, field->height, field->mines);
 }
 
-usize field_adjacent_mines(field_t field, u32 x, u32 y)
+size_t field_adjacent_mines(field_t field, uint x, uint y)
 {
     cell_t cell;
-    usize mines = 0;
-    i32 off_x, off_y;
+    size_t mines = 0;
+    int off_x, off_y;
 
-    for (off_x = -1; off_x <= 1; off_x++) {
-        for (off_y = -1; off_y <= 1; off_y++) {
+    for (off_x = -1; off_x <= 1; ++off_x) {
+        for (off_y = -1; off_y <= 1; ++off_y) {
             if (off_x == 0 && off_y == 0) {
                 continue;
             }
@@ -124,23 +132,26 @@ usize field_adjacent_mines(field_t field, u32 x, u32 y)
     return mines;
 }
 
-void field_render(field_t field, mat4 projection, i32 mouse_x, i32 mouse_y)
+void field_render(field_t field, mat4 projection)
 {
-    shader_t shader = resources_shader(RS_SHADER_FIELD);
+    shader_t shader;
+    int cur_x, cur_y;
 
-    field_normalize_mouse_pos(field, mouse_x, mouse_y);
+    window_cursor_pos(&cur_x, &cur_y);
+    field_normalize_pos(field, &cur_x, &cur_y);
 
-    shader_use(shader);
+    shader_use(shader = resources_shader(RS_SHADER_FIELD));
 
     shader_set_uniform_m4fv(shader, "u_projection", projection);
     shader_set_uniform_2i(shader, "u_field_size", field->width, field->height);
     shader_set_uniform_2i(shader, "u_field_pos", FIELD_LX, FIELD_LY);
-    shader_set_uniform_2i(shader, "u_mouse_pos", mouse_x, mouse_y);
+    shader_set_uniform_2i(shader, "u_mouse_pos", cur_x, cur_y);
 
     texture_bind(resources_texture_atlas());
 
     glBindBuffer(GL_ARRAY_BUFFER, field->render.VBO);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, field->size * sizeof(u8), field->cells);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, field->size * sizeof(uint8_t),
+                    field->cells);
     glBindBuffer(GL_ARRAY_BUFFER, GL_NONE);
 
     glBindVertexArray(field->render.VAO);

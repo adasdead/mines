@@ -3,19 +3,22 @@
 
 #include "util/basic_types.h"
 
-struct game_difficulty {
-    usize id;
-    const char name[32];
-    u32 field_width, field_height;
-    usize mines_count;
+#define DIFFICULTY_TOTAL                                \
+    (sizeof difficulties / sizeof *difficulties)
+
+#define DIFFICULTY(n) (&difficulties[n])
+
+struct difficulty {
+    const char          *name;
+    uint                 field_width;
+    uint                 field_height;
+    size_t               mines_count;
+} static const difficulties[] = {
+    { "BEGGINER",          9,      9,    10 },
+    { "INTERMEDIATE",     16,     16,    40 },
+    { "EXPERT",           30,     16,    99 },
 };
 
-typedef struct game_difficulty *game_difficulty_t;
-
-static struct game_difficulty game_difficulties[] = {
-    { 0,    "BEGGINER",          9,      9,    10 },
-    { 1,    "INTERMEDIATE",     16,     16,    40 },
-    { 2,    "EXPERT",           30,     16,    99 },
-};
+typedef const struct difficulty *difficulty_t;
 
 #endif /* GAME_DIFFICULTY */

@@ -15,6 +15,7 @@
         "field.h": "c",
         "smile.h": "c",
         "difficulty.h": "c",
-        "window.h": "c"
+        "window.h": "c",
+        "typeinfo": "c"
     }
 }

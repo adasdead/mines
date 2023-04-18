@@ -6,12 +6,12 @@
 
 mat4 matrix4x4_allocate(bool unit)
 {
-    usize i;
+    size_t i;
     mat4 tmp = calloc(MATRIX4X4_SIZE, sizeof *tmp);
 
     if (tmp != NULL) {
         if (unit) {
-            for (i = 0; i < MATRIX4X4_WIDTH; i++) {
+            for (i = 0; i < MATRIX4X4_WIDTH; ++i) {
                 matrix4x4_set(tmp, i, i, 1.0f);
             }
         }
@@ -25,14 +25,14 @@ mat4 matrix4x4_allocate(bool unit)
 
 mat4 matrix4x4_mult(mat4 dest, const mat4 src)
 {
-    u32 i, j, k;
+    size_t i, j, k;
     mat4 result = matrix4x4_allocate(false);
-    f32 x, y, z;
+    float x, y, z;
 
     if (dest != NULL && src != NULL) {
-        for (i = 0; i < MATRIX4X4_WIDTH; i++) {
-            for (j = 0; j < MATRIX4X4_WIDTH; j++) {
-                for (k = 0; k < MATRIX4X4_WIDTH; k++) {
+        for (i = 0; i < MATRIX4X4_WIDTH; ++i) {
+            for (j = 0; j < MATRIX4X4_WIDTH; ++j) {
+                for (k = 0; k < MATRIX4X4_WIDTH; ++k) {
                     x = matrix4x4_get(dest, i, k);
                     y = matrix4x4_get(src, k, j);
                     z = matrix4x4_get(result, i, j);
@@ -49,8 +49,8 @@ mat4 matrix4x4_mult(mat4 dest, const mat4 src)
     return dest;
 }
 
-mat4 matrix4x4_ortho(f32 left, f32 right, f32 bottom, f32 top,
-                     f32 near, f32 far)
+mat4 matrix4x4_ortho(float left, float right, float bottom, float top,
+                     float near, float far)
 {
     mat4 matrix = matrix4x4_allocate(true);
 
@@ -65,7 +65,7 @@ mat4 matrix4x4_ortho(f32 left, f32 right, f32 bottom, f32 top,
     return matrix;
 }
 
-mat4 matrix4x4_scale(mat4 dest, f32 x, f32 y)
+mat4 matrix4x4_scale(mat4 dest, float x, float y)
 {
     mat4 matrix = matrix4x4_allocate(true);
     
@@ -77,7 +77,7 @@ mat4 matrix4x4_scale(mat4 dest, f32 x, f32 y)
     return dest;
 }
 
-mat4 matrix4x4_translate(mat4 dest, f32 x, f32 y)
+mat4 matrix4x4_translate(mat4 dest, float x, float y)
 {
     mat4 matrix = matrix4x4_allocate(true);
 

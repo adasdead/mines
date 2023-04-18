@@ -8,18 +8,19 @@
 #include "util/basic_types.h"
 
 struct counter {
-    i32 value;
-    mat4 models[3];
+    int                 value;
+    mat4               *models;
 
     struct {
-        GLuint VAO, VBO;
+        GLuint          VAO;
+        GLuint          VBO;
     } render;
 };
 
 typedef struct counter *counter_t;
 
 counter_t counter_create(void);
-void counter_update_x(counter_t counter, u32 x);
+void counter_update_x(counter_t counter, uint x);
 void counter_render(const counter_t counter, mat4 projection);
 void counter_free(counter_t counter);
 
