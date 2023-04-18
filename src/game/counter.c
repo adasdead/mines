@@ -7,12 +7,6 @@
 
 #include "definitions.h"
 
-#define OFFSET_X                                    0.25f
-#define OFFSET_Y                                    OFFSET_X
-#define SCALE_FACTOR_X                              0.82f
-#define SCALE_FACTOR_Y                              1.465f
-#define DEFAULT                                     1
-
 /***************************************************************************/
 
 /* https://cp-algorithms.com/algebra/binary-exp.html#implementation */
@@ -58,7 +52,7 @@ counter_t counter_create(void)
         glBindBuffer(GL_ARRAY_BUFFER, GL_NONE);
         glBindVertexArray(GL_NONE);
 
-        counter_update_x(counter, DEFAULT);
+        counter_update_x(counter, COUNTER_DEFAULT);
     }
     else {
         logger_fatal("Failed to allocate memory for counter");
@@ -67,24 +61,25 @@ counter_t counter_create(void)
     return counter;
 }
 
-void counter_update_x(counter_t counter, uint x)
+void counter_update_x(counter_t counter, float x)
 {
     int i;
-    float tx;
+    float tx, ty = COUNTER_Y + COUNTER_OFFSET_Y;
+    float sx = COUNTER_SCALE_FACTOR_X, sy = COUNTER_SCALE_FACTOR_Y;
 
     for (i = 0; i < COUNTER_NUMBERS; ++i) {
-        tx = x + OFFSET_X + i * SCALE_FACTOR_X;
+        tx = x + i * COUNTER_SCALE_FACTOR_X;
         matrix4x4_free(counter->models[i]);
         counter->models[i] = matrix4x4_allocate(true);
-        matrix4x4_scale(counter->models[i], SCALE_FACTOR_X, SCALE_FACTOR_Y);
-        matrix4x4_translate(counter->models[i], tx, COUNTER_Y + OFFSET_Y);
+        matrix4x4_scale(counter->models[i], sx, sy);
+        matrix4x4_translate(counter->models[i], tx, ty);
     }
 }
 
 void counter_render(const counter_t counter, mat4 projection)
 {
-    int i, p, n = binary_pow(10, COUNTER_NUMBERS) - 1;
     shader_t shader;
+    int i, p, n = binary_pow(10, COUNTER_NUMBERS) - 1;
 
     shader_use(shader = resources_shader(RS_SHADER_COUNTER));
     shader_set_uniform_m4fv(shader, "u_projection", projection);

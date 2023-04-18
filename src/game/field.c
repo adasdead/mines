@@ -45,8 +45,10 @@ field_t field_create(uint width, uint height, uint mines)
 
 bool field_normalize_pos(const field_t field, int *x, int *y)
 {
-    *x = ((int) (*x / CELL_WIDTH_PX / window_scale_factor())) - FIELD_LX;
-    *y = ((int) (*y / CELL_WIDTH_PX / window_scale_factor())) - FIELD_LY;
+    float cell_width_px = window_scale_factor() * CELL_WIDTH_PX;
+
+    *x = ((int) (*x / cell_width_px)) - FIELD_LX;
+    *y = ((int) (*y / cell_width_px)) - FIELD_LY;
 
     return (*x < field->width) && (*y < field->height) &&
            (*x >= 0)           && (*y >= 0);

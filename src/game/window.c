@@ -55,6 +55,7 @@ double window_scale_factor(void)
         const GLFWvidmode *video_mode;
         video_mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
         factor = (video_mode->height) * 1.f / SCREEN_BASE_HEIGHT;
+        logger_info("Scale factor: %f", factor);
     }
 
     return factor;

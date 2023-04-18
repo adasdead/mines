@@ -11,17 +11,14 @@
 
 #include "definitions.h"
 
-#define OFFSET                                              0.15f
-#define SCALE_FACTOR                                        1.655f
-
 /***************************************************************************/
 
 static bool check_cursor_on_smile(smile_t smile, uint x, uint y)
 {
     float cell_width_px = window_scale_factor() * CELL_WIDTH_PX;
-    float left = (smile->x + OFFSET) * cell_width_px;
-    float top = (SMILE_Y + OFFSET) * cell_width_px;
-    float offset = SCALE_FACTOR * cell_width_px;
+    float left = (smile->x + SMILE_OFFSET) * cell_width_px;
+    float top = (SMILE_Y + SMILE_OFFSET) * cell_width_px;
+    float offset = SMILE_SCALE_FACTOR * cell_width_px;
 
     return !(y <= top) && !(y >= top + offset) &&
            !(x <= left) && !(x >= left + offset);
@@ -63,14 +60,14 @@ smile_t smile_create(enum smile_state state)
 
 void smile_update_width(smile_t smile, uint width)
 {
-    float y = SMILE_Y + OFFSET;
+    float y = SMILE_Y + SMILE_OFFSET;
 
     smile->x = (width / 2.0f) - 1.0f;
 
     matrix4x4_free(smile->model);
     smile->model = matrix4x4_allocate(true);
-    matrix4x4_scale(smile->model, SCALE_FACTOR, SCALE_FACTOR);
-    matrix4x4_translate(smile->model, smile->x + OFFSET, y);
+    matrix4x4_scale(smile->model, SMILE_SCALE_FACTOR, SMILE_SCALE_FACTOR);
+    matrix4x4_translate(smile->model, smile->x + SMILE_OFFSET, y);
 }
 
 void smile_render(const smile_t smile, mat4 projection)
