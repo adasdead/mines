@@ -6,21 +6,20 @@
 
 #include "definitions.h"
 
-static mat4 projection;
+static mat4 projection = NULL;
 static GLFWwindow *window;
 static double factor = 0.0;
 
 void window_init(void)
 {
-    uint width = difficulties->field_width + FIELD_LX + FIELD_RX;
-    uint height = difficulties->field_height + FIELD_LY + FIELD_RY;
-    uint win_width = CELL_WIDTH_PX * width * window_scale_factor();
-    uint win_height = CELL_WIDTH_PX * height * window_scale_factor();
+    uint width = FIELD_LX + difficulties->field_width + FIELD_RX;
+    uint height = FIELD_LY + difficulties->field_height + FIELD_RY;
+    uint win_width = width * window_scale_factor();
+    uint win_height = height * window_scale_factor();
 
     glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
-    window = glfwCreateWindow(win_width, win_height, WINDOW_NAME,
-                              NULL, NULL);
+    window = glfwCreateWindow(win_width, win_height, WINDOW_NAME, NULL, NULL);
 
     if (window == NULL) {
         glfwTerminate();
@@ -29,20 +28,18 @@ void window_init(void)
 
     glfwMakeContextCurrent(window);
 
-    projection = matrix4x4_allocate(false);
-
     logger_info("Window created(%dx%d)", win_width, win_height);
 }
 
 void window_resize(uint width, uint height)
 {
-    uint win_width = CELL_WIDTH_PX * window_scale_factor() * width;
-    uint win_height = CELL_WIDTH_PX * window_scale_factor() * height;
+    uint win_width = width * window_scale_factor();
+    uint win_height = height * window_scale_factor();
 
     glfwSetWindowSize(window_glfw(), win_width, win_height);
     glViewport(0, 0, win_width, win_height);
 
-    matrix4x4_free(projection);
+    if (projection != NULL) matrix4x4_free(projection);
     
     projection = matrix4x4_ortho(0.0f, width, height, 0.0f, -1.0f, 1.0f);
 
@@ -54,7 +51,7 @@ double window_scale_factor(void)
     if (factor == 0.0) {
         const GLFWvidmode *video_mode;
         video_mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-        factor = (video_mode->height) * 1.f / SCREEN_BASE_HEIGHT;
+        factor = (video_mode->height) * 1.f / WINDOW_SCALE;
         logger_info("Scale factor: %f", factor);
     }
 
@@ -63,8 +60,8 @@ double window_scale_factor(void)
 
 void window_normalize_cursor_pos(int *x, int *y)
 {
-    *x = *x / CELL_WIDTH_PX / window_scale_factor();
-    *y = *y / CELL_WIDTH_PX / window_scale_factor();
+    *x = *x / window_scale_factor();
+    *y = *y / window_scale_factor();
 }
 
 void window_cursor_pos(int *x, int *y)

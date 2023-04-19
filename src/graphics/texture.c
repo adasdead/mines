@@ -9,9 +9,9 @@
 
 #include "util/logger.h"
 
-struct texture *texture_load(const char *file_path)
+texture_t texture_load(const char *file_path)
 {
-    struct texture *texture = malloc(sizeof *texture);
+    texture_t texture = malloc(sizeof *texture);
     GLubyte *bytes;
 
     bytes = stbi_load(file_path, &texture->width, &texture->height,
@@ -43,7 +43,7 @@ struct texture *texture_load(const char *file_path)
     return texture;
 }
 
-void texture_bind(const struct texture *texture)
+void texture_bind(const texture_t texture)
 {
     if (texture) {
         glActiveTexture(GL_TEXTURE0);
@@ -51,7 +51,7 @@ void texture_bind(const struct texture *texture)
     }
 }
 
-void texture_free(struct texture *texture)
+void texture_free(texture_t texture)
 {
     free(texture);
 }

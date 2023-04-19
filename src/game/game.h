@@ -1,8 +1,7 @@
 #ifndef GAME_GAME_H
 #define GAME_GAME_H
 
-#include "math/matrix4x4.h"
-
+#include "util/matrix4x4.h"
 #include "util/basic_types.h"
 
 void game_new(void);

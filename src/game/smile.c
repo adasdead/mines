@@ -11,28 +11,24 @@
 
 #include "definitions.h"
 
-/***************************************************************************/
-
 static bool check_cursor_on_smile(smile_t smile, uint x, uint y)
 {
-    float cell_width_px = window_scale_factor() * CELL_WIDTH_PX;
-    float left = (smile->x + SMILE_OFFSET) * cell_width_px;
-    float top = (SMILE_Y + SMILE_OFFSET) * cell_width_px;
-    float offset = SMILE_SCALE_FACTOR * cell_width_px;
+    float scale_factor = window_scale_factor();
+    float left = (smile->x + SMILE_OFFSET) * scale_factor;
+    float top = (SMILE_Y + SMILE_OFFSET) * scale_factor;
+    float offset = SMILE_SCALE_FACTOR * scale_factor;
 
-    return !(y <= top) && !(y >= top + offset) &&
-           !(x <= left) && !(x >= left + offset);
+    return !((int)(y <= top)  | (int)(y >= top + offset) |
+             (int)(x <= left) | (int)(x >= left + offset));
 }
 
-/***************************************************************************/
-
-smile_t smile_create(enum smile_state state)
+smile_t smile_create(void (*click_callback)(void))
 {
     smile_t smile = malloc(sizeof *smile);
 
     if (smile != NULL) {
-        smile->state = state;
-        smile->model = matrix4x4_allocate(false);
+        smile->model = matrix4x4_allocate();
+        smile->click_callback = click_callback;
 
         glGenVertexArrays(1, &smile->render.VAO);
         glGenBuffers(1, &smile->render.VBO);
@@ -60,21 +56,23 @@ smile_t smile_create(enum smile_state state)
 
 void smile_update_width(smile_t smile, uint width)
 {
-    float y = SMILE_Y + SMILE_OFFSET;
+    static const float y = SMILE_Y + SMILE_OFFSET;
+    static const float scale_factor = SMILE_SCALE_FACTOR;
 
     smile->x = (width / 2.0f) - 1.0f;
 
-    matrix4x4_free(smile->model);
-    smile->model = matrix4x4_allocate(true);
-    matrix4x4_scale(smile->model, SMILE_SCALE_FACTOR, SMILE_SCALE_FACTOR);
+    matrix4x4_identity(smile->model);
+    matrix4x4_scale(smile->model, scale_factor, scale_factor);
     matrix4x4_translate(smile->model, smile->x + SMILE_OFFSET, y);
 }
 
 void smile_render(const smile_t smile, mat4 projection)
 {
-    shader_t shader;
+    shader_t shader = resources_shader(RS_SHADER_SMILE);
 
-    shader_use(shader = resources_shader(RS_SHADER_SMILE));
+    if (smile == NULL || projection == NULL) return;
+
+    shader_use(shader);
     shader_set_uniform_m4fv(shader, "u_projection", projection);
     shader_set_uniform_m4fv(shader, "u_model", smile->model);
     shader_set_uniform_1i(shader, "u_smile_state", smile->state);
@@ -94,17 +92,20 @@ void smile_mouse(smile_t smile, uint x, uint y, bool press)
             return;
         }
 
-        game_new();
+        smile->click_callback();
     }
 
-    if (smile->state == SMILE_STATE_DEAD) return;
-    if (smile->state == SMILE_STATE_COOL) return;
-
-    if (press) {
-        smile->state = SMILE_STATE_O;
-    }
-    else {
-        smile->state = SMILE_STATE_DEFAULT;
+    switch (smile->state) {
+    case SMILE_STATE_DEAD:
+    case SMILE_STATE_COOL:
+        return;
+    
+    default:
+        if (press) {
+            smile->state = SMILE_STATE_O;
+        } else {
+            smile->state = SMILE_STATE_DEFAULT;
+        }
     }
 }
 
@@ -113,6 +114,7 @@ void smile_free(smile_t smile)
     if (smile != NULL) {
         glDeleteVertexArrays(1, &smile->render.VAO);
         glDeleteBuffers(1, &smile->render.VBO);
+        matrix4x4_free(smile->model);
         free(smile);
     }
 }

@@ -9,8 +9,10 @@ struct texture {
     int                 height;
 };
 
-struct texture *texture_load(const char *file_path);
-void texture_bind(const struct texture *texture);
-void texture_free(struct texture *texture);
+typedef struct texture *texture_t;
+
+texture_t texture_load(const char *file_path);
+void texture_bind(const texture_t texture);
+void texture_free(texture_t texture);
 
 #endif /* GRAPHICS_TEXTURE_H */

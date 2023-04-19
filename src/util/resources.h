@@ -12,7 +12,7 @@ enum resources_shader_type {
 };
 
 void resources_load(void);
-struct texture *resources_texture_atlas(void);
+texture_t resources_texture_atlas(void);
 shader_t resources_shader(enum resources_shader_type type);
 void resources_free(void);
 

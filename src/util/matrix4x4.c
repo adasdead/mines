@@ -4,29 +4,36 @@
 
 #include "util/logger.h"
 
-mat4 matrix4x4_allocate(bool unit)
+mat4 matrix4x4_allocate(void)
 {
-    size_t i;
-    mat4 tmp = calloc(MATRIX4X4_SIZE, sizeof *tmp);
+    mat4 mat = calloc(MATRIX4X4_SIZE, sizeof *mat);
 
-    if (tmp != NULL) {
-        if (unit) {
-            for (i = 0; i < MATRIX4X4_WIDTH; ++i) {
-                matrix4x4_set(tmp, i, i, 1.0f);
-            }
-        }
-    }
-    else {
+    if (mat == NULL) {
         logger_fatal("Failed to allocate memory for matrix4x4");
     }
 
-    return tmp;
+    return mat;
+}
+
+mat4 matrix4x4_identity(mat4 mat)
+{
+    size_t i;
+
+    if (mat != NULL) {
+        memset(mat, 0, MATRIX4X4_SIZE * sizeof *mat);
+
+        for (i = 0; i < MATRIX4X4_WIDTH; ++i) {
+            matrix4x4_set(mat, i, i, 1.0f);
+        }
+    }
+
+    return mat;
 }
 
 mat4 matrix4x4_mult(mat4 dest, const mat4 src)
 {
     size_t i, j, k;
-    mat4 result = matrix4x4_allocate(false);
+    mat4 result = matrix4x4_allocate();
     float x, y, z;
 
     if (dest != NULL && src != NULL) {
@@ -49,10 +56,31 @@ mat4 matrix4x4_mult(mat4 dest, const mat4 src)
     return dest;
 }
 
+void matrix4x4_free(mat4 mat)
+{
+    if (mat != NULL) {
+        free(mat);
+    }
+}
+
+void matrix4x4_set(mat4 matrix, uint i, uint j, float value)
+{
+    if (matrix != NULL) {
+        matrix[MATRIX4X4_WIDTH * i + j] = value;
+    }
+}
+
+float matrix4x4_get(mat4 matrix, uint i, uint j)
+{
+    return matrix[MATRIX4X4_WIDTH * i + j];
+}
+
 mat4 matrix4x4_ortho(float left, float right, float bottom, float top,
                      float near, float far)
 {
-    mat4 matrix = matrix4x4_allocate(true);
+    mat4 matrix = matrix4x4_allocate();
+
+    matrix4x4_identity(matrix);
 
     matrix4x4_set(matrix, 0, 0, 2.0f / (right - left));
     matrix4x4_set(matrix, 1, 1, 2.0f / (top - bottom));
@@ -67,7 +95,9 @@ mat4 matrix4x4_ortho(float left, float right, float bottom, float top,
 
 mat4 matrix4x4_scale(mat4 dest, float x, float y)
 {
-    mat4 matrix = matrix4x4_allocate(true);
+    mat4 matrix = matrix4x4_allocate();
+
+    matrix4x4_identity(matrix);
     
     matrix4x4_set(matrix, 0, 0, x);
     matrix4x4_set(matrix, 1, 1, y);
@@ -79,7 +109,9 @@ mat4 matrix4x4_scale(mat4 dest, float x, float y)
 
 mat4 matrix4x4_translate(mat4 dest, float x, float y)
 {
-    mat4 matrix = matrix4x4_allocate(true);
+    mat4 matrix = matrix4x4_allocate();
+
+    matrix4x4_identity(matrix);
 
     matrix4x4_set(matrix, 3, 0, x);
     matrix4x4_set(matrix, 3, 1, y);

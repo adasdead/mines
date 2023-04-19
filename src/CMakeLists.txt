@@ -6,13 +6,12 @@ add_executable(${PROJECT_NAME}  main.c)
 target_sources(${PROJECT_NAME} PRIVATE
     glad/glad.c
 
-    math/matrix4x4.c
-
     graphics/shader.c
     graphics/texture.c
 
     util/resources.c
     util/logger.c
+    util/matrix4x4.c
 
     game/game.c
     game/window.c

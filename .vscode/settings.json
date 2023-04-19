@@ -16,6 +16,18 @@
         "smile.h": "c",
         "difficulty.h": "c",
         "window.h": "c",
-        "typeinfo": "c"
+        "typeinfo": "c",
+        "cctype": "c",
+        "cmath": "c",
+        "compare": "c",
+        "concepts": "c",
+        "cstdio": "c",
+        "cstdlib": "c",
+        "cwchar": "c",
+        "limits": "c",
+        "new": "c",
+        "*.tcc": "c",
+        "cinttypes": "c",
+        "cstdint": "c"
     }
 }

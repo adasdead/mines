@@ -3,8 +3,7 @@
 
 #include "graphics/opengl.h"
 
-#include "math/matrix4x4.h"
-
+#include "util/matrix4x4.h"
 #include "util/basic_types.h"
 
 enum smile_state {
@@ -17,9 +16,11 @@ enum smile_state {
 };
 
 struct smile {
-    float                 x;
+    float               x;
     enum smile_state    state;
     mat4                model;
+    
+    void (*click_callback)(void);
 
     struct {
         GLuint          VAO;
@@ -29,7 +30,7 @@ struct smile {
 
 typedef struct smile *smile_t;
 
-smile_t smile_create(enum smile_state state);
+smile_t smile_create(void (*click_callback)(void));
 void smile_update_width(smile_t smile, uint width);
 void smile_render(const smile_t smile, mat4 projection);
 void smile_mouse(smile_t smile, uint x, uint y, bool press);

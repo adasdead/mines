@@ -2,15 +2,14 @@
 #define DEFINITIONS_H
 
 #define WINDOW_NAME                         "Minesweeper"
+#define WINDOW_SCALE                        33.75f
 
 #define ASSETS_DIR                          "assets/"
 
-#define SCREEN_BASE_HEIGHT                  540
-
 #define FIELD_LY                            4
 #define FIELD_LX                            1
-#define FIELD_RY                            1
-#define FIELD_RX                            FIELD_RY
+#define FIELD_RY                            FIELD_LX
+#define FIELD_RX                            FIELD_LX
 
 #define SMILE_Y                             1
 #define SMILE_OFFSET                        0.15f
@@ -20,10 +19,8 @@
 #define COUNTER_NUMBERS                     3
 #define COUNTER_OFFSET_X                    0.5f
 #define COUNTER_OFFSET_Y                    0.25f
-#define COUNTER_SCALE_FACTOR_X              0.82f
-#define COUNTER_SCALE_FACTOR_Y              1.465f
+#define COUNTER_WIDTH                       0.82f
+#define COUNTER_HEIGHT                      1.465f
 #define COUNTER_DEFAULT                     1
-
-#define CELL_WIDTH_PX                       16
 
 #endif /* DEFINITIONS_H */

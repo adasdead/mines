@@ -3,23 +3,22 @@
 
 #include "graphics/opengl.h"
 
-#include "math/matrix4x4.h"
-
 #include "game/window.h"
 #include "game/cell.h"
 
+#include "util/matrix4x4.h"
 #include "util/basic_types.h"
 
 #include "definitions.h"
 
 struct field {
-    size_t               size;
+    size_t              size;
 
-    uint                 width;
-    uint                 height;
-    uint                 mines;
+    uint                width;
+    uint                height;
+    uint                mines;
 
-    union cell          *cells;
+    union cell         *cells;
 
     struct {
         GLuint          VAO;

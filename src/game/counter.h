@@ -3,8 +3,7 @@
 
 #include "graphics/opengl.h"
 
-#include "math/matrix4x4.h"
-
+#include "util/matrix4x4.h"
 #include "util/basic_types.h"
 
 struct counter {

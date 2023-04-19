@@ -10,6 +10,8 @@
 
 #include "definitions.h"
 
+#define SWAP(a, b) (a ^= b ^= a ^=b)
+
 field_t field_create(uint width, uint height, uint mines)
 {
     field_t field = malloc(sizeof *field);
@@ -45,10 +47,8 @@ field_t field_create(uint width, uint height, uint mines)
 
 bool field_normalize_pos(const field_t field, int *x, int *y)
 {
-    float cell_width_px = window_scale_factor() * CELL_WIDTH_PX;
-
-    *x = ((int) (*x / cell_width_px)) - FIELD_LX;
-    *y = ((int) (*y / cell_width_px)) - FIELD_LY;
+    *x = ((int) (*x / window_scale_factor())) - FIELD_LX;
+    *y = ((int) (*y / window_scale_factor())) - FIELD_LY;
 
     return (*x < field->width) && (*y < field->height) &&
            (*x >= 0)           && (*y >= 0);
@@ -56,46 +56,57 @@ bool field_normalize_pos(const field_t field, int *x, int *y)
 
 cell_t field_cell(field_t field, int x, int y)
 {
-    if (field != NULL) {
-        if (x >= field->width  || x < 0 ||
-            y >= field->height || y < 0) {
-            
-            return NULL;
-        }
+    if (field != NULL && x >= 0 && x < field->width &&
+                         y >= 0 && y < field->height) {
 
         return field->cells + (field->width * y + x);
     }
 
-    logger_warn("field is NULL (field_cell)");
     return NULL;
 }
 
 void field_generate(field_t field, uint x, uint y)
 {
-    cell_t cell;
+    size_t free_cells = field->width * field->height - 1;
     size_t placed_mines = 0;
-    uint rnd_x, rnd_y;
+    size_t i, j, k;
+    uint *free_cells_array = NULL;
+    cell_t cell;
 
     if (field == NULL) {
         logger_warn("field is NULL (field_generate)");
         return;
     }
 
-    while (placed_mines != field->mines) {
-        rnd_x = rand() % field->width;
-        rnd_y = rand() % field->height;
+    free_cells_array = malloc(free_cells * sizeof(uint));
 
-        if (rnd_x == x && rnd_y == y) {
-            continue;
-        }
+    if (free_cells_array == NULL) {
+        logger_fatal("malloc failed (field_generate)");
+        return;
+    }
 
-        cell = field_cell(field, rnd_x, rnd_y);
+    for (i = 0, k = 0; i < field->width; ++i) {
+        for (j = 0; j < field->height; ++j) {
+            if (i == x && j == y) {
+                continue;
+            }
 
-        if (cell->type != CELL_TYPE_BOMB) {
-            cell->type = CELL_TYPE_BOMB;
-            placed_mines++;
+            free_cells_array[k++] = i + j * field->width;
         }
     }
+
+    for (i = 0; i < free_cells; ++i) {
+        j = rand() % free_cells;
+        SWAP(free_cells_array[i], free_cells_array[j]);
+    }
+
+    for (i = 0; i < field->mines; ++i) {
+        j = free_cells_array[i];
+        cell = field_cell(field, j % field->width, j / field->width);
+        cell->type = CELL_TYPE_BOMB;
+    }
+
+    free(free_cells_array);
 
     for (x = 0; x < field->width; ++x) {
         for (y = 0; y < field->height; ++y) {
@@ -136,14 +147,13 @@ size_t field_adjacent_mines(field_t field, uint x, uint y)
 
 void field_render(field_t field, mat4 projection)
 {
-    shader_t shader;
+    shader_t shader = resources_shader(RS_SHADER_FIELD);
     int cur_x, cur_y;
 
     window_cursor_pos(&cur_x, &cur_y);
     field_normalize_pos(field, &cur_x, &cur_y);
 
-    shader_use(shader = resources_shader(RS_SHADER_FIELD));
-
+    shader_use(shader);
     shader_set_uniform_m4fv(shader, "u_projection", projection);
     shader_set_uniform_2i(shader, "u_field_size", field->width, field->height);
     shader_set_uniform_2i(shader, "u_field_pos", FIELD_LX, FIELD_LY);

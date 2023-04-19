@@ -6,8 +6,6 @@
 
 #include "util/logger.h"
 
-/***************************************************************************/
-
 static char *read_strings_from_file(const char *file_path)
 {
     FILE *fp = fopen(file_path, "rb");
@@ -79,8 +77,6 @@ static GLuint shader_create(const char *file_path, GLenum type)
 
     return GL_NONE;
 }
-
-/***************************************************************************/
 
 shader_t shader_load_g(const char *vertex_path, const char *fragment_path,
                        const char *geometry_path)

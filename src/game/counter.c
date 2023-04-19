@@ -7,34 +7,27 @@
 
 #include "definitions.h"
 
-/***************************************************************************/
+#define MAX(a, b) ((a > b) ? (a) : (b))
+#define MIN(a, b) ((a < b) ? (a) : (b))
 
-/* https://cp-algorithms.com/algebra/binary-exp.html#implementation */
 static long long binary_pow(long long n, long long x)
 {
-    long long result = 1;
-
-    while (x != 0) {
-        if(x & 1) result *= n;
-
-        n *= n;
-        x >>= 1;
-    }
-
-    return result;
+    if (x == 0) return 1;
+    if (x % 2 == 0) return binary_pow(n * n, x / 2);
+    return n * binary_pow(n * n, x / 2);
 }
-
-/***************************************************************************/
 
 counter_t counter_create(void)
 {
+    size_t i;
     counter_t counter = malloc(sizeof *counter);
 
     if (counter != NULL) {
-        memset(counter, 0, sizeof *counter);
+        counter->models = calloc(COUNTER_NUMBERS, sizeof *counter->models);
 
-        counter->models = calloc(COUNTER_NUMBERS,
-                                 sizeof *counter->models);
+        for (i = 0; i < COUNTER_NUMBERS; i++) {
+            counter->models[i] = matrix4x4_allocate();
+        }
 
         glGenVertexArrays(1, &counter->render.VAO);
         glGenBuffers(1, &counter->render.VBO);
@@ -63,39 +56,50 @@ counter_t counter_create(void)
 
 void counter_update_x(counter_t counter, float x)
 {
-    int i;
-    float tx, ty = COUNTER_Y + COUNTER_OFFSET_Y;
-    float sx = COUNTER_SCALE_FACTOR_X, sy = COUNTER_SCALE_FACTOR_Y;
+    mat4 *cur = counter->models;
+    size_t i;
+    
+    static const float ty = COUNTER_Y + COUNTER_OFFSET_Y;
+    static const float sx = COUNTER_WIDTH;
+    static const float sy = COUNTER_HEIGHT;
 
-    for (i = 0; i < COUNTER_NUMBERS; ++i) {
-        tx = x + i * COUNTER_SCALE_FACTOR_X;
-        matrix4x4_free(counter->models[i]);
-        counter->models[i] = matrix4x4_allocate(true);
-        matrix4x4_scale(counter->models[i], sx, sy);
-        matrix4x4_translate(counter->models[i], tx, ty);
+    for (i = 0; i < COUNTER_NUMBERS; ++i, ++cur) {
+        matrix4x4_identity(*cur);
+        matrix4x4_scale(*cur, sx, sy);
+        matrix4x4_translate(*cur, x + i * sx, ty);
     }
 }
 
 void counter_render(const counter_t counter, mat4 projection)
 {
-    shader_t shader;
-    int i, p, n = binary_pow(10, COUNTER_NUMBERS) - 1;
+    shader_t shader = resources_shader(RS_SHADER_COUNTER);
+    int i, n;
 
-    shader_use(shader = resources_shader(RS_SHADER_COUNTER));
+    static long long n_max = -1;
+    static long long p_base[COUNTER_NUMBERS];
+
+    if (counter == NULL || projection == NULL) return;
+
+    if (n_max < 0) {
+        n_max = binary_pow(10, COUNTER_NUMBERS) - 1;
+        
+        for (i = 0; i < COUNTER_NUMBERS; i++) {
+            p_base[i] = binary_pow(10, (COUNTER_NUMBERS - 1) - i);
+        }
+    }
+
+    n = MAX(MIN(n_max, counter->value), 0);
+
+    shader_use(shader);
     shader_set_uniform_m4fv(shader, "u_projection", projection);
 
     texture_bind(resources_texture_atlas());
 
     glBindVertexArray(counter->render.VAO);
 
-    if (n > counter->value) n = counter->value;
-    if (0 > counter->value) n = 0;
-
-    for (int i = 0; i < COUNTER_NUMBERS; ++i) {
-        p = binary_pow(10, (COUNTER_NUMBERS - 1) - i);
-
+    for (i = 0; i < COUNTER_NUMBERS; ++i) {
         shader_set_uniform_m4fv(shader, "u_model", counter->models[i]);
-        shader_set_uniform_1i(shader, "u_number", n / p % 10);
+        shader_set_uniform_1i(shader, "u_number", n / p_base[i] % 10);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 5);
     }
 

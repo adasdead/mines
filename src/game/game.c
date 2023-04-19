@@ -123,12 +123,11 @@ static void open_cell(int x, int y)
 
 void game_new(void)
 {
-    int width;
-    float x_offset;
+    float width, x_offset;
 
     field_free(field);
 
-    x_offset = COUNTER_NUMBERS * COUNTER_SCALE_FACTOR_X + COUNTER_OFFSET_X;
+    x_offset = COUNTER_NUMBERS * COUNTER_WIDTH + COUNTER_OFFSET_X;
 
     field = field_create(DIFFICULTY(cur_difficulty_n)->field_width,
                          DIFFICULTY(cur_difficulty_n)->field_height,
@@ -142,6 +141,7 @@ void game_new(void)
 
     smile_update_width(smile, width);
 
+    smile->state = SMILE_STATE_DEFAULT;
     mine_counter->value = field->mines;
     time_counter->value = opened_cells = 0;
     state = GAME_STATE_IDLE;
@@ -149,7 +149,7 @@ void game_new(void)
 
 void game_init(void)
 {
-    smile = smile_create(SMILE_STATE_DEFAULT);
+    smile = smile_create(game_new);
     mine_counter = counter_create();
     counter_update_x(mine_counter, FIELD_LX + COUNTER_OFFSET_X);
     time_counter = counter_create();

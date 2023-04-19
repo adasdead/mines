@@ -2,7 +2,7 @@
 
 #include "definitions.h"
 
-static struct texture *texture_atlas;
+static texture_t texture_atlas;
 static shader_t shaders[RS_SHADER_TOTAL];
 
 void resources_load(void)
@@ -13,14 +13,14 @@ void resources_load(void)
                                              ASSETS_DIR"field.fs.glsl",
                                              ASSETS_DIR"field.gs.glsl");
 
-    shaders[RS_SHADER_SMILE] = shader_load(ASSETS_DIR"smile.vs.glsl",
+    shaders[RS_SHADER_SMILE] = shader_load(ASSETS_DIR"base.vs.glsl",
                                            ASSETS_DIR"smile.fs.glsl");
 
-    shaders[RS_SHADER_COUNTER] = shader_load(ASSETS_DIR"counter.vs.glsl",
+    shaders[RS_SHADER_COUNTER] = shader_load(ASSETS_DIR"base.vs.glsl",
                                              ASSETS_DIR"counter.fs.glsl");
 }
 
-struct texture *resources_texture_atlas(void)
+texture_t resources_texture_atlas(void)
 {
     return texture_atlas;
 }
