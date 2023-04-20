@@ -28,6 +28,7 @@
         "new": "c",
         "*.tcc": "c",
         "cinttypes": "c",
-        "cstdint": "c"
+        "cstdint": "c",
+        "glfw_callbacks.h": "c"
     }
 }

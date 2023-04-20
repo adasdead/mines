@@ -12,7 +12,7 @@
 
 #include "definitions.h"
 
-#define GAME_IS_OVER                                            \
+#define GAME_IS_OVER                                                        \
     ((state == GAME_STATE_LOSE) || (state == GAME_STATE_WON))
 
 enum game_state {
