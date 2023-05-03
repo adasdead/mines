@@ -15,24 +15,20 @@
 #define GAME_IS_OVER                                                        \
     ((state == GAME_STATE_LOSE) || (state == GAME_STATE_WON))
 
-enum game_state {
-    GAME_STATE_STARTED,
-    GAME_STATE_IDLE,
-    GAME_STATE_LOSE,
-    GAME_STATE_WON
-
-} static state = GAME_STATE_IDLE;
-
-static uint cur_difficulty_n = 0;
-
-static size_t opened_cells = 0;
 static time_t start_time;
+static size_t opened_cells = 0;
+
+static uint current_difficulty = 0;
 
 /* objects */
 static field_t field = NULL;
 static smile_t smile = NULL;
 static counter_t mine_counter = NULL;
 static counter_t time_counter = NULL;
+
+enum game_state {
+    GAME_STATE_STARTED, GAME_STATE_IDLE, GAME_STATE_LOSE, GAME_STATE_WON
+} static state = GAME_STATE_IDLE;
 
 /****************************************************************************/
 
@@ -48,12 +44,16 @@ static void check_lose(cell_t cell)
             for (y = 0; y < field->height; ++y) {
                 cell = field_cell(field, x, y);
 
-                if (cell->state == CELL_STATE_FLAGGED &&
-                    cell->type != CELL_TYPE_BOMB) {
-                    
-                    cell->state = CELL_STATE_OPENED;
-                    cell->type = CELL_TYPE_NO_BOMB;
-                    continue;
+                if (cell->state == CELL_STATE_FLAGGED) {
+                    if (cell->type != CELL_TYPE_BOMB) {
+                        cell->state = CELL_STATE_OPENED;
+                        cell->type = CELL_TYPE_NO_BOMB;
+                        continue;
+                    }
+
+                    if (cell->type == CELL_TYPE_BOMB) {
+                        continue;
+                    }
                 }
 
                 cell->state = CELL_STATE_OPENED;
@@ -87,6 +87,7 @@ static void check_won(void)
 
         smile->state = SMILE_STATE_COOL;
         state = GAME_STATE_WON;
+        mine_counter->value = 0;
 
         logger_info("Won");
     }
@@ -127,15 +128,15 @@ void game_new(void)
 
     field_free(field);
 
-    x_offset = COUNTER_NUMBERS * COUNTER_WIDTH + COUNTER_OFFSET_X;
-
-    field = field_create(DIFFICULTY(cur_difficulty_n)->field_width,
-                         DIFFICULTY(cur_difficulty_n)->field_height,
-                         DIFFICULTY(cur_difficulty_n)->mines_count);
+    field = field_create(DIFFICULTY(current_difficulty)->field_width,
+                         DIFFICULTY(current_difficulty)->field_height,
+                         DIFFICULTY(current_difficulty)->mines_count);
     
     width = FIELD_LX + FIELD_RX + field->width;
 
-    window_resize(width, FIELD_LY + FIELD_RY + field->height);
+    window_normalized_resize(width, FIELD_LY + FIELD_RY + field->height);
+
+    x_offset = COUNTER_NUMBERS * COUNTER_WIDTH + COUNTER_OFFSET_LRX;
 
     counter_update_x(time_counter, width - x_offset - FIELD_RX);
 
@@ -151,21 +152,23 @@ void game_init(void)
 {
     smile = smile_create(game_new);
     mine_counter = counter_create();
-    counter_update_x(mine_counter, FIELD_LX + COUNTER_OFFSET_X);
+    counter_update_x(mine_counter, FIELD_LX + COUNTER_OFFSET_LRX);
     time_counter = counter_create();
     game_new();
 }
 
 void game_loop(void)
 {
+    window_t window = window_instance();
+
     if (state == GAME_STATE_STARTED) {
         time_counter->value = time(NULL) - start_time;
     }
 
-    field_render(field, window_projection());
-    smile_render(smile, window_projection());
-    counter_render(mine_counter, window_projection());
-    counter_render(time_counter, window_projection());
+    field_render(field, window->projection);
+    smile_render(smile, window->projection);
+    counter_render(mine_counter, window->projection);
+    counter_render(time_counter, window->projection);
 }
 
 void game_on_left_click(int x, int y, bool press)
@@ -214,14 +217,13 @@ void game_on_right_click(int x, int y, bool press)
 
 void game_toggle_difficulty(void)
 {
-    if ((cur_difficulty_n + 1) != DIFFICULTY_TOTAL) {
-        cur_difficulty_n++;
-    } else {
-        cur_difficulty_n = 0;
-    }
+    const char *difficulty_name;
 
-    logger_info("Difficulty changed to %s",
-                DIFFICULTY(cur_difficulty_n)->name);
+    current_difficulty = (current_difficulty + 1) % DIFFICULTY_TOTAL;
+    
+    difficulty_name = DIFFICULTY(current_difficulty)->name;
+
+    logger_info("Difficulty changed to %s", difficulty_name);
     
     game_new();
 }

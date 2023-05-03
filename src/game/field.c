@@ -10,7 +10,19 @@
 
 #include "definitions.h"
 
-#define SWAP(a, b) (a ^= b ^= a ^=b)
+#define swap(a, b) ((a) ^= (b) ^= (a) ^= (b))
+
+static void shuffle(int *array, size_t size)
+{
+    size_t i, j;
+
+    if (array == NULL || size <= 1) return;
+
+    for (i = size - 1; i > 0; i--) {
+        j = rand() % (i + 1);
+        swap(array[i], array[j]);
+    }
+}
 
 field_t field_create(uint width, uint height, uint mines)
 {
@@ -47,8 +59,8 @@ field_t field_create(uint width, uint height, uint mines)
 
 bool field_normalize_pos(const field_t field, int *x, int *y)
 {
-    *x = ((int) (*x / window_scale_factor())) - FIELD_LX;
-    *y = ((int) (*y / window_scale_factor())) - FIELD_LY;
+    *x = ((int) (*x / window_instance()->scale)) - FIELD_LX;
+    *y = ((int) (*y / window_instance()->scale)) - FIELD_LY;
 
     return (*x < field->width) && (*y < field->height) &&
            (*x >= 0)           && (*y >= 0);
@@ -95,10 +107,7 @@ void field_generate(field_t field, uint x, uint y)
         }
     }
 
-    for (i = 0; i < free_cells; ++i) {
-        j = rand() % free_cells;
-        SWAP(free_cells_array[i], free_cells_array[j]);
-    }
+    shuffle(free_cells_array, free_cells);
 
     for (i = 0; i < field->mines; ++i) {
         j = free_cells_array[i];
@@ -147,10 +156,10 @@ size_t field_adjacent_mines(field_t field, uint x, uint y)
 
 void field_render(field_t field, mat4 projection)
 {
+    window_t window = window_instance();
     shader_t shader = resources_shader(RS_SHADER_FIELD);
-    int cur_x, cur_y;
+    int cur_x = window->cursor.x, cur_y = window->cursor.y;
 
-    window_cursor_pos(&cur_x, &cur_y);
     field_normalize_pos(field, &cur_x, &cur_y);
 
     shader_use(shader);

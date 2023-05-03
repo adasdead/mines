@@ -13,10 +13,10 @@
 
 static bool check_cursor_on_smile(smile_t smile, uint x, uint y)
 {
-    float scale_factor = window_scale_factor();
+    float scale_factor = window_instance()->scale;
     float left = (smile->x + SMILE_OFFSET) * scale_factor;
-    float top = (SMILE_Y + SMILE_OFFSET) * scale_factor;
-    float offset = SMILE_SCALE_FACTOR * scale_factor;
+    float top = (SMILE_LY + SMILE_OFFSET) * scale_factor;
+    float offset = SMILE_SCALE * scale_factor;
 
     return !((int)(y <= top)  | (int)(y >= top + offset) |
              (int)(x <= left) | (int)(x >= left + offset));
@@ -56,13 +56,12 @@ smile_t smile_create(void (*click_callback)(void))
 
 void smile_update_width(smile_t smile, uint width)
 {
-    static const float y = SMILE_Y + SMILE_OFFSET;
-    static const float scale_factor = SMILE_SCALE_FACTOR;
-
+    static const float y = SMILE_LY + SMILE_OFFSET;
+    
     smile->x = (width / 2.0f) - 1.0f;
 
     matrix4x4_identity(smile->model);
-    matrix4x4_scale(smile->model, scale_factor, scale_factor);
+    matrix4x4_scale(smile->model, SMILE_SCALE, SMILE_SCALE);
     matrix4x4_translate(smile->model, smile->x + SMILE_OFFSET, y);
 }
 

@@ -6,14 +6,24 @@
 #include "util/matrix4x4.h"
 #include "util/basic_types.h"
 
+struct window {
+    bool                initialized;
+    GLFWwindow         *handle;
+    uint                width, height;
+    mat4                projection;
+    double              scale;
+
+    struct {
+        int             x, y;
+    } cursor;
+};
+
+typedef struct window *window_t;
+
 void window_init(void);
-void window_resize(uint width, uint height);
-void window_normalize_cursor_pos(int *x, int *y);
-void window_cursor_pos(int *x, int *y);
-double window_scale_factor(void);
+void window_normalized_resize(int width, int height);
 void window_free(void);
 
-GLFWwindow *window_glfw(void);
-mat4 window_projection(void);
+window_t window_instance(void);
 
 #endif /* GAME_WINDOW_H */

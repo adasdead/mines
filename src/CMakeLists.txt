@@ -1,6 +1,12 @@
 find_package(OpenGL REQUIRED)
 
-add_executable(${PROJECT_NAME} WIN32 main.c)
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    add_executable(${PROJECT_NAME} main.c)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE DEBUG=1)
+else()
+    add_executable(${PROJECT_NAME} WIN32 main.c)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE DEBUG=0)
+endif()
 
 target_sources(${PROJECT_NAME} PRIVATE
     graphics/shader.c
@@ -15,12 +21,6 @@ target_sources(${PROJECT_NAME} PRIVATE
     game/field.c
     game/smile.c
     game/counter.c
-
-    glfw_callbacks.c
-)
-
-target_sources(${PROJECT_NAME} PRIVATE
-    ${PROJECT_DEPS_DIR}/glad/glad.c
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE
@@ -37,6 +37,7 @@ target_link_libraries(${PROJECT_NAME}
     ${MATH_LIB}
     OpenGL::GL
     glfw
+    glad
 )
 
 add_custom_command(TARGET ${PROJECT_NAME}

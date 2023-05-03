@@ -30,7 +30,7 @@ mat4 matrix4x4_identity(mat4 mat)
     return mat;
 }
 
-mat4 matrix4x4_mult(mat4 dest, const mat4 src)
+mat4 matrix4x4_mult(mat4 restrict dest, const mat4 src)
 {
     size_t i, j, k;
     mat4 result = matrix4x4_allocate();
@@ -93,7 +93,7 @@ mat4 matrix4x4_ortho(float left, float right, float bottom, float top,
     return matrix;
 }
 
-mat4 matrix4x4_scale(mat4 dest, float x, float y)
+mat4 matrix4x4_scale(mat4 restrict dest, float x, float y)
 {
     mat4 matrix = matrix4x4_allocate();
 
@@ -107,7 +107,7 @@ mat4 matrix4x4_scale(mat4 dest, float x, float y)
     return dest;
 }
 
-mat4 matrix4x4_translate(mat4 dest, float x, float y)
+mat4 matrix4x4_translate(mat4 restrict dest, float x, float y)
 {
     mat4 matrix = matrix4x4_allocate();
 

@@ -13,8 +13,8 @@ void logger_log(enum logger_level level, const char *file_name,
                 size_t line_no,  const char *__restrict format, ...)
 {
     const char *color, *status;
-    va_list args_list;
     FILE *stream = stdout;
+    va_list args_list;
 
     va_start(args_list, format);
 
@@ -41,10 +41,10 @@ void logger_log(enum logger_level level, const char *file_name,
         status = "INFO";
     }
 
-    fprintf(stream, "[%s:%zu] %s%s"ANSI_RESET" ", file_name, line_no,
-           color, status);
+    fprintf(stream, "[%s:%zu] %s%s"ANSI_RESET" ", file_name, line_no, color,
+            status);
     vfprintf(stream, format, args_list);
-    fprintf(stream, "\n");
+    fputc('\n', stream);
 
     va_end(args_list);
 }

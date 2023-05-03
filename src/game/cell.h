@@ -24,15 +24,11 @@
 #define CELL_TYPE_QUESTION              13
 #define CELL_TYPE_FLAG                  14
 
-union cell {
-    byte                    _byte;
-
-    struct {
-        byte                type  : 4;
-        byte                state : 4;
-    };
+struct cell {
+    byte                type  : 4;
+    byte                state : 4;
 };
 
-typedef union cell *cell_t;
+typedef struct cell *cell_t;
 
 #endif /* GAME_CELL_H */

@@ -18,7 +18,7 @@ struct field {
     uint                height;
     uint                mines;
 
-    union cell         *cells;
+    struct cell         *cells;
 
     struct {
         GLuint          VAO;

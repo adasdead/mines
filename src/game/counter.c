@@ -59,7 +59,7 @@ void counter_update_x(counter_t counter, float x)
     mat4 *cur = counter->models;
     size_t i;
     
-    static const float ty = COUNTER_Y + COUNTER_OFFSET_Y;
+    static const float ty = COUNTER_LY + COUNTER_OFFSET_LY;
     static const float sx = COUNTER_WIDTH;
     static const float sy = COUNTER_HEIGHT;
 
