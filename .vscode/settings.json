@@ -29,6 +29,12 @@
         "*.tcc": "c",
         "cinttypes": "c",
         "cstdint": "c",
-        "glfw_callbacks.h": "c"
+        "glfw_callbacks.h": "c",
+        "random": "c",
+        "system_error": "c",
+        "functional": "c",
+        "tuple": "c",
+        "utility": "c",
+        "string.h": "c"
     }
 }

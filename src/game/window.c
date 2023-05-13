@@ -109,6 +109,12 @@ void window_normalized_resize(int width, int height)
     logger_info("Window resized(%dx%d)", window.width, window.height);
 }
 
+void window_normalize_pos(int *x, int *y)
+{
+    *x = ((int) (*x / window_instance()->scale));
+    *y = ((int) (*y / window_instance()->scale));
+}
+
 void window_free(void)
 {
     if (window.initialized) {

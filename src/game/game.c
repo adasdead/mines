@@ -7,6 +7,7 @@
 #include "game/smile.h"
 #include "game/difficulty.h"
 #include "game/counter.h"
+#include "game/border.h"
 
 #include "util/logger.h"
 
@@ -25,12 +26,11 @@ static field_t field = NULL;
 static smile_t smile = NULL;
 static counter_t mine_counter = NULL;
 static counter_t time_counter = NULL;
+static border_t border = NULL;
 
 enum game_state {
     GAME_STATE_STARTED, GAME_STATE_IDLE, GAME_STATE_LOSE, GAME_STATE_WON
 } static state = GAME_STATE_IDLE;
-
-/****************************************************************************/
 
 static void check_lose(cell_t cell)
 {
@@ -120,11 +120,10 @@ static void open_cell(int x, int y)
     }
 }
 
-/****************************************************************************/
-
-void game_new(void)
+static void game_update_objects(void)
 {
-    float width, x_offset;
+    float x_offset;
+    int width, height;
 
     field_free(field);
 
@@ -133,27 +132,38 @@ void game_new(void)
                          DIFFICULTY(current_difficulty)->mines_count);
     
     width = FIELD_LX + FIELD_RX + field->width;
+    height = FIELD_LY + FIELD_RY + field->height;
 
-    window_normalized_resize(width, FIELD_LY + FIELD_RY + field->height);
+    window_normalized_resize(width, height);
 
     x_offset = COUNTER_NUMBERS * COUNTER_WIDTH + COUNTER_OFFSET_LRX;
 
-    counter_update_x(time_counter, width - x_offset - FIELD_RX);
+    counter_update_model_matrices(time_counter, width - x_offset - FIELD_RX);
 
     smile_update_width(smile, width);
+    border_update_frame(border, width, height);
+}
 
+void game_new(void)
+{
+    field_clear(field);
     smile->state = SMILE_STATE_DEFAULT;
     mine_counter->value = field->mines;
     time_counter->value = opened_cells = 0;
     state = GAME_STATE_IDLE;
+
+    logger_info("New game");
 }
 
 void game_init(void)
 {
     smile = smile_create(game_new);
     mine_counter = counter_create();
-    counter_update_x(mine_counter, FIELD_LX + COUNTER_OFFSET_LRX);
+    counter_update_model_matrices(mine_counter, FIELD_LX + COUNTER_OFFSET_LRX);
     time_counter = counter_create();
+    border = border_create();
+
+    game_update_objects();
     game_new();
 }
 
@@ -165,6 +175,7 @@ void game_loop(void)
         time_counter->value = time(NULL) - start_time;
     }
 
+    border_render(border, window->projection);
     field_render(field, window->projection);
     smile_render(smile, window->projection);
     counter_render(mine_counter, window->projection);
@@ -175,7 +186,9 @@ void game_on_left_click(int x, int y, bool press)
 {
     smile_mouse(smile, x, y, press);
 
-    if (!field_normalize_pos(field, &x, &y)) return;
+    field_normalize_pos(&x, &y);
+
+    if (!field_is_include(field, x, y)) return;
 
     if (press && state != GAME_STATE_LOSE) {
         if (state == GAME_STATE_IDLE) {
@@ -193,7 +206,9 @@ void game_on_right_click(int x, int y, bool press)
     cell_t cell;
 
     if (!GAME_IS_OVER) {
-        if (!field_normalize_pos(field, &x, &y)) return;
+        field_normalize_pos(&x, &y);
+
+        if (!field_is_include(field, x, y)) return;
 
         if (press) {
             cell = field_cell(field, x, y);
@@ -225,6 +240,7 @@ void game_toggle_difficulty(void)
 
     logger_info("Difficulty changed to %s", difficulty_name);
     
+    game_update_objects();
     game_new();
 }
 
@@ -234,4 +250,5 @@ void game_free(void)
     smile_free(smile);
     counter_free(mine_counter);
     counter_free(time_counter);
+    border_free(border);
 }

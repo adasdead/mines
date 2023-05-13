@@ -16,7 +16,7 @@ mat4 matrix4x4_mult(mat4 restrict dest, const mat4 src);
 void matrix4x4_free(mat4 mat);
 
 void matrix4x4_set(mat4 matrix, uint i, uint j, float value);
-float matrix4x4_get(mat4 matrix, uint i, uint j);
+float matrix4x4_get(const mat4 matrix, uint i, uint j);
 
 mat4 matrix4x4_ortho(float left, float right, float bottom, float top,
                      float near, float far);

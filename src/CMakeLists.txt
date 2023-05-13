@@ -13,7 +13,6 @@ target_sources(${PROJECT_NAME} PRIVATE
     graphics/texture.c
 
     util/resources.c
-    util/logger.c
     util/matrix4x4.c
 
     game/game.c
@@ -21,14 +20,21 @@ target_sources(${PROJECT_NAME} PRIVATE
     game/field.c
     game/smile.c
     game/counter.c
+    game/border.c
 )
+
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    target_sources(${PROJECT_NAME} PRIVATE
+        util/logger.c
+    )
+endif()
 
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${PROJECT_SOURCE_DIR} ${PROJECT_DEPS_DIR}
 )
 
 # set_target_properties(${PROJECT_NAME} PROPERTIES
-#     COMPILE_OPTIONS "-fanalyzer"
+#     COMPILE_OPTION+S "-fanalyzer"
 #     EXCLUDE_FROM_DEFAULT_BUILD true
 # )
 

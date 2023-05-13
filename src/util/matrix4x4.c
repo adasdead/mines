@@ -70,7 +70,7 @@ void matrix4x4_set(mat4 matrix, uint i, uint j, float value)
     }
 }
 
-float matrix4x4_get(mat4 matrix, uint i, uint j)
+float matrix4x4_get(const mat4 matrix, uint i, uint j)
 {
     return matrix[MATRIX4X4_WIDTH * i + j];
 }

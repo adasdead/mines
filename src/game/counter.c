@@ -10,6 +10,21 @@
 #define MAX(a, b) ((a > b) ? (a) : (b))
 #define MIN(a, b) ((a < b) ? (a) : (b))
 
+static struct
+{
+    bool                calculated;
+
+    /*
+     * Maximum counter value:
+     * COUNTER_NUMBERS = 3 => n_max = 999
+     */
+    long long           n_max;
+    
+    /* Base divisor to get each digit of the counter */
+    long long           p_base[COUNTER_NUMBERS];
+
+} cached_values = {0};
+
 static long long binary_pow(long long n, long long x)
 {
     if (x == 0) return 1;
@@ -17,78 +32,71 @@ static long long binary_pow(long long n, long long x)
     return n * binary_pow(n * n, x / 2);
 }
 
+static void calculate_cached_values(void)
+{
+    size_t i;
+    long long base;
+
+    if (!cached_values.calculated) {
+        cached_values.n_max = binary_pow(10, COUNTER_NUMBERS) - 1;
+        
+        for (i = 0; i < COUNTER_NUMBERS; i++) {
+            base = binary_pow(10, (COUNTER_NUMBERS - 1) - i);
+            cached_values.p_base[i] = base;
+        }
+
+        cached_values.calculated = true;
+    }
+}
+
+static int normalize_counter_value(int value)
+{
+    return MAX(MIN(cached_values.n_max, value), 0);
+}
+
 counter_t counter_create(void)
 {
     size_t i;
     counter_t counter = malloc(sizeof *counter);
 
-    if (counter != NULL) {
-        counter->models = calloc(COUNTER_NUMBERS, sizeof *counter->models);
-
-        for (i = 0; i < COUNTER_NUMBERS; i++) {
-            counter->models[i] = matrix4x4_allocate();
-        }
-
-        glGenVertexArrays(1, &counter->render.VAO);
-        glGenBuffers(1, &counter->render.VBO);
-
-        glBindBuffer(GL_ARRAY_BUFFER, counter->render.VBO);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(OPENGL_BASIC_VERTICES),
-                     OPENGL_BASIC_VERTICES, GL_STATIC_DRAW);
-
-        glBindVertexArray(counter->render.VAO);
-
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE,
-                              2 * sizeof *OPENGL_BASIC_VERTICES, NULL);
-
-        glBindBuffer(GL_ARRAY_BUFFER, GL_NONE);
-        glBindVertexArray(GL_NONE);
-
-        counter_update_x(counter, COUNTER_DEFAULT);
-    }
-    else {
+    if (counter == NULL) {
         logger_fatal("Failed to allocate memory for counter");
     }
+
+    counter->models = calloc(COUNTER_NUMBERS, sizeof *counter->models);
+
+    for (i = 0; i < COUNTER_NUMBERS; i++) {
+        counter->models[i] = matrix4x4_allocate();
+    }
+
+    OPENGL_RENDER_GEN_BASIC_BUFFERS(counter);
+
+    calculate_cached_values();
+    counter_update_model_matrices(counter, COUNTER_DEFAULT);
 
     return counter;
 }
 
-void counter_update_x(counter_t counter, float x)
+void counter_update_model_matrices(counter_t counter, float start_x)
 {
-    mat4 *cur = counter->models;
     size_t i;
+    mat4 *cur = counter->models;
     
+    /* ty - vertical position of counter digit */
     static const float ty = COUNTER_LY + COUNTER_OFFSET_LY;
-    static const float sx = COUNTER_WIDTH;
-    static const float sy = COUNTER_HEIGHT;
 
     for (i = 0; i < COUNTER_NUMBERS; ++i, ++cur) {
         matrix4x4_identity(*cur);
-        matrix4x4_scale(*cur, sx, sy);
-        matrix4x4_translate(*cur, x + i * sx, ty);
+        matrix4x4_scale(*cur, COUNTER_WIDTH, COUNTER_HEIGHT);
+        matrix4x4_translate(*cur, start_x + i * COUNTER_WIDTH, ty);
     }
 }
 
 void counter_render(const counter_t counter, mat4 projection)
 {
+    int n = normalize_counter_value(counter->value), i;
     shader_t shader = resources_shader(RS_SHADER_COUNTER);
-    int i, n;
-
-    static long long n_max = -1;
-    static long long p_base[COUNTER_NUMBERS];
-
-    if (counter == NULL || projection == NULL) return;
-
-    if (n_max < 0) {
-        n_max = binary_pow(10, COUNTER_NUMBERS) - 1;
-        
-        for (i = 0; i < COUNTER_NUMBERS; i++) {
-            p_base[i] = binary_pow(10, (COUNTER_NUMBERS - 1) - i);
-        }
-    }
-
-    n = MAX(MIN(n_max, counter->value), 0);
+    long long base;
 
     shader_use(shader);
     shader_set_uniform_m4fv(shader, "u_projection", projection);
@@ -98,8 +106,18 @@ void counter_render(const counter_t counter, mat4 projection)
     glBindVertexArray(counter->render.VAO);
 
     for (i = 0; i < COUNTER_NUMBERS; ++i) {
+        base = cached_values.p_base[i];
+
         shader_set_uniform_m4fv(shader, "u_model", counter->models[i]);
-        shader_set_uniform_1i(shader, "u_number", n / p_base[i] % 10);
+
+        /* 
+         * >>> n / base % 10
+         *
+         * For example, if n = 123 and base = 10,
+         * then u_number = 2 for the second position from the right.
+         */
+        shader_set_uniform_1i(shader, "u_number", n / base % 10);
+        
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 5);
     }
 
@@ -111,6 +129,8 @@ void counter_free(counter_t counter)
     size_t i;
 
     if (counter != NULL) {
+        OPENGL_RENDER_FREE(counter);
+
         for (i = 0; i < COUNTER_NUMBERS; ++i) {
             matrix4x4_free(counter->models[i]);
         }

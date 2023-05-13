@@ -2,6 +2,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #include "game/window.h"
 
@@ -10,17 +11,21 @@
 
 #include "definitions.h"
 
-#define swap(a, b) ((a) ^= (b) ^= (a) ^= (b))
-
 static void shuffle(int *array, size_t size)
 {
+    int tmp;
     size_t i, j;
 
     if (array == NULL || size <= 1) return;
 
+    srand(time(NULL));
+
     for (i = size - 1; i > 0; i--) {
         j = rand() % (i + 1);
-        swap(array[i], array[j]);
+        
+        tmp = array[j];
+        array[j] = array[i];
+        array[i] = tmp;
     }
 }
 
@@ -28,42 +33,39 @@ field_t field_create(uint width, uint height, uint mines)
 {
     field_t field = malloc(sizeof *field);
 
-    if (field != NULL) {
-        field->height = height;
-        field->width = width;
-        field->mines = mines;
-        field->size = width * height;
-        field->cells = calloc(width * height, sizeof *(field->cells));
-
-        glGenBuffers(1, &field->render.VBO);
-        glGenVertexArrays(1, &field->render.VAO);
-
-        glBindBuffer(GL_ARRAY_BUFFER, field->render.VBO);
-        glBufferData(GL_ARRAY_BUFFER, width * height, NULL, GL_STATIC_DRAW);
-
-        glBindVertexArray(field->render.VAO);
-        glEnableVertexAttribArray(0);
-        glVertexAttribIPointer(0, 1, GL_UNSIGNED_BYTE, sizeof(uint8_t), NULL);
-        glBindBuffer(GL_ARRAY_BUFFER, GL_NONE);
-        glBindVertexArray(GL_NONE);
-
-        logger_info("Field(%ux%u | %u mines) created!", width,
-                    height, mines);
-    }
-    else {
+    if (field == NULL) {
         logger_fatal("Failed to allocate memory for field");
     }
+
+    field->height = height;
+    field->width = width;
+    field->mines = mines;
+    field->size = width * height;
+    field->cells = calloc(width * height, sizeof *(field->cells));
+
+    /*** Gen OpenGL buffers ***/
+
+    glGenBuffers(1, &field->render.VBO);
+    glGenVertexArrays(1, &field->render.VAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, field->render.VBO);
+    glBufferData(GL_ARRAY_BUFFER, width * height, NULL, GL_STATIC_DRAW);
+
+    glBindVertexArray(field->render.VAO);
+    glEnableVertexAttribArray(0);
+    glVertexAttribIPointer(0, 1, GL_UNSIGNED_BYTE, sizeof(uint8_t), NULL);
+    glBindBuffer(GL_ARRAY_BUFFER, GL_NONE);
+    glBindVertexArray(GL_NONE);
+
+    logger_info("Field(%ux%u | %u mines) created!", width, height, mines);
 
     return field;
 }
 
-bool field_normalize_pos(const field_t field, int *x, int *y)
+bool field_is_include(const field_t field, int x, int y)
 {
-    *x = ((int) (*x / window_instance()->scale)) - FIELD_LX;
-    *y = ((int) (*y / window_instance()->scale)) - FIELD_LY;
-
-    return (*x < field->width) && (*y < field->height) &&
-           (*x >= 0)           && (*y >= 0);
+    return (x < field->width) && (y < field->height) &&
+           (x >= 0)           && (y >= 0);
 }
 
 cell_t field_cell(field_t field, int x, int y)
@@ -80,15 +82,9 @@ cell_t field_cell(field_t field, int x, int y)
 void field_generate(field_t field, uint x, uint y)
 {
     size_t free_cells = field->width * field->height - 1;
-    size_t placed_mines = 0;
-    size_t i, j, k;
     uint *free_cells_array = NULL;
+    size_t i, j, k;
     cell_t cell;
-
-    if (field == NULL) {
-        logger_warn("field is NULL (field_generate)");
-        return;
-    }
 
     free_cells_array = malloc(free_cells * sizeof(uint));
 
@@ -160,18 +156,21 @@ void field_render(field_t field, mat4 projection)
     shader_t shader = resources_shader(RS_SHADER_FIELD);
     int cur_x = window->cursor.x, cur_y = window->cursor.y;
 
-    field_normalize_pos(field, &cur_x, &cur_y);
+    if (field == NULL || projection == NULL) return;
 
+    field_normalize_pos(&cur_x, &cur_y);
+    
     shader_use(shader);
     shader_set_uniform_m4fv(shader, "u_projection", projection);
-    shader_set_uniform_2i(shader, "u_field_size", field->width, field->height);
+    shader_set_uniform_2i(shader, "u_field_size", field->width,
+                                                  field->height);
     shader_set_uniform_2i(shader, "u_field_pos", FIELD_LX, FIELD_LY);
     shader_set_uniform_2i(shader, "u_mouse_pos", cur_x, cur_y);
 
     texture_bind(resources_texture_atlas());
 
     glBindBuffer(GL_ARRAY_BUFFER, field->render.VBO);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, field->size * sizeof(uint8_t),
+    glBufferSubData(GL_ARRAY_BUFFER, 0, field->size * sizeof(GLubyte),
                     field->cells);
     glBindBuffer(GL_ARRAY_BUFFER, GL_NONE);
 
@@ -180,11 +179,17 @@ void field_render(field_t field, mat4 projection)
     glBindVertexArray(GL_NONE);
 }
 
-void field_free(struct field *field)
+void field_clear(field_t field)
 {
     if (field != NULL) {
-        glDeleteVertexArrays(1, &field->render.VAO);
-        glDeleteBuffers(1, &field->render.VBO);
+        memset(field->cells, CELL_STATE_CLOSED, field->size);
+    }
+}
+
+void field_free(field_t field)
+{
+    if (field != NULL) {
+        OPENGL_RENDER_FREE(field);
         free(field->cells);
         free(field);
     }

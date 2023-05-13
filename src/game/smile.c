@@ -26,43 +26,29 @@ smile_t smile_create(void (*click_callback)(void))
 {
     smile_t smile = malloc(sizeof *smile);
 
-    if (smile != NULL) {
-        smile->model = matrix4x4_allocate();
-        smile->click_callback = click_callback;
-
-        glGenVertexArrays(1, &smile->render.VAO);
-        glGenBuffers(1, &smile->render.VBO);
-
-        glBindBuffer(GL_ARRAY_BUFFER, smile->render.VBO);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(OPENGL_BASIC_VERTICES),
-                     OPENGL_BASIC_VERTICES, GL_STATIC_DRAW);
-
-        glBindVertexArray(smile->render.VAO);
-
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE,
-                              2 * sizeof *OPENGL_BASIC_VERTICES, NULL);
-
-        glBindBuffer(GL_ARRAY_BUFFER, GL_NONE);
-        glBindVertexArray(GL_NONE);
-
-    }
-    else {
+    if (smile == NULL) {
         logger_fatal("Failed to allocate memory for smile");
     }
+
+    smile->model = matrix4x4_allocate();
+    smile->click_callback = click_callback;
+
+    OPENGL_RENDER_GEN_BASIC_BUFFERS(smile);
 
     return smile;
 }
 
 void smile_update_width(smile_t smile, uint width)
 {
-    static const float y = SMILE_LY + SMILE_OFFSET;
+    if (smile != NULL) {
+        static const float y = SMILE_LY + SMILE_OFFSET;
     
-    smile->x = (width / 2.0f) - 1.0f;
+        smile->x = (width / 2.0f) - 1.0f;
 
-    matrix4x4_identity(smile->model);
-    matrix4x4_scale(smile->model, SMILE_SCALE, SMILE_SCALE);
-    matrix4x4_translate(smile->model, smile->x + SMILE_OFFSET, y);
+        matrix4x4_identity(smile->model);
+        matrix4x4_scale(smile->model, SMILE_SCALE, SMILE_SCALE);
+        matrix4x4_translate(smile->model, smile->x + SMILE_OFFSET, y);
+    }
 }
 
 void smile_render(const smile_t smile, mat4 projection)
@@ -85,6 +71,8 @@ void smile_render(const smile_t smile, mat4 projection)
 
 void smile_mouse(smile_t smile, uint x, uint y, bool press)
 {
+    if (smile == NULL) return;
+
     if (check_cursor_on_smile(smile, x, y)) {
         if (press) {
             smile->state = SMILE_STATE_CLICK;
@@ -111,8 +99,7 @@ void smile_mouse(smile_t smile, uint x, uint y, bool press)
 void smile_free(smile_t smile)
 {
     if (smile != NULL) {
-        glDeleteVertexArrays(1, &smile->render.VAO);
-        glDeleteBuffers(1, &smile->render.VBO);
+        OPENGL_RENDER_FREE(smile);
         matrix4x4_free(smile->model);
         free(smile);
     }

@@ -18,6 +18,10 @@ void resources_load(void)
 
     shaders[RS_SHADER_COUNTER] = shader_load(ASSETS_DIR"base.vs.glsl",
                                              ASSETS_DIR"counter.fs.glsl");
+
+    shaders[RS_SHADER_BORDER] = shader_load_g(ASSETS_DIR"border.vs.glsl",
+                                              ASSETS_DIR"border.fs.glsl",
+                                              ASSETS_DIR"border.gs.glsl");
 }
 
 texture_t resources_texture_atlas(void)

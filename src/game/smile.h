@@ -22,10 +22,7 @@ struct smile {
     
     void (*click_callback)(void);
 
-    struct {
-        GLuint          VAO;
-        GLuint          VBO;
-    } render;
+    OPENGL_RENDER_STRUCT;
 };
 
 typedef struct smile *smile_t;

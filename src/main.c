@@ -6,21 +6,12 @@
 #include "util/logger.h"
 #include "util/resources.h"
 
-static int init(void);
-static int loop(void);
-static int free_all(void);
-
-int main(void)
-{
-    return init();
-}
-
 static void on_glfw_error_callback(int code, const char *message)
 {
     logger_warn("GLFW Error: %s", message);
 }
 
-static int init(void)
+int main(void)
 {
     if (!glfwInit()) {
         logger_fatal("GLFW initialization failed");
@@ -41,11 +32,6 @@ static int init(void)
     resources_load();
     game_init();
 
-    return loop();
-}
-
-static int loop(void)
-{
     while (!glfwWindowShouldClose(window_instance()->handle)) {
         glClearColor(1.0f, 0.5f, 1.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
@@ -56,16 +42,10 @@ static int loop(void)
         glfwPollEvents();
     }
 
-    return free_all();
-}
-
-static int free_all(void)
-{
     game_free();
     resources_free();
     window_free();
 
     glfwTerminate();
-
     return 0;
 }

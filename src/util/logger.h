@@ -23,7 +23,15 @@ enum logger_level {
     LOGGER_INFO, LOGGER_WARN, LOGGER_FATAL,
 };
 
+#if DEBUG
 void logger_log(enum logger_level level, const char *file_name,
-                size_t line_no, const char *__restrict format, ...);
+                size_t line_no, const char *restrict format, ...);
+#else
+static void logger_log(enum logger_level level, const char *file_name,
+                       size_t line_no, const char *restrict format, ...)
+{
+}
+#endif
+
 
 #endif /* UTIL_LOGGER_H */

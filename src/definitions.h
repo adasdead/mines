@@ -1,6 +1,10 @@
 #ifndef DEFINITIONS_H
 #define DEFINITIONS_H
 
+/****************************************************************************
+ * Project definitions
+ ***************************************************************************/
+
 #define WINDOW_NAME                         "Minesweeper"
 #define WINDOW_SCALE                        33.75f
 
@@ -22,5 +26,7 @@
 #define COUNTER_WIDTH                       0.82f
 #define COUNTER_HEIGHT                      1.465f
 #define COUNTER_DEFAULT                     1
+
+#define BORDER_SEP_LY                       3
 
 #endif /* DEFINITIONS_H */
