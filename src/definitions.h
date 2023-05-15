@@ -8,7 +8,7 @@
 #define WINDOW_NAME                         "Minesweeper"
 #define WINDOW_SCALE                        33.75f
 
-#define ASSETS_DIR                          "assets/"
+#define ASSETS_DIR                          "assets"
 
 #define FIELD_LX                            1
 #define FIELD_LY                            4
@@ -25,7 +25,6 @@
 #define COUNTER_OFFSET_LY                   0.25f
 #define COUNTER_WIDTH                       0.82f
 #define COUNTER_HEIGHT                      1.465f
-#define COUNTER_DEFAULT                     1
 
 #define BORDER_SEP_LY                       3
 

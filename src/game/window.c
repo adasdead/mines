@@ -1,5 +1,7 @@
 #include "window.h"
 
+#include <stb/stb_image.h>
+
 #include "game/difficulty.h"
 #include "game/game.h"
 
@@ -9,49 +11,51 @@
 
 static struct window window = {0};
 
-static void window_cursor_pos_callback(GLFWwindow *win, double x, double y)
+static void cursor_pos_callback(GLFWwindow *win, double x, double y)
 {
-    window_t window = glfwGetWindowUserPointer(win);
-
-    window->cursor.x = (int) x;
-    window->cursor.y = (int) y;
+    window.cursor.x = (int) x;
+    window.cursor.y = (int) y;
 }
 
-void window_key_callback(GLFWwindow *win, int key, int code, int act, int mods)
+static void
+key_callback(GLFWwindow *win, int key, int code, int act, int mods)
 {
-    window_t window = glfwGetWindowUserPointer(win);
-
     if (act != GLFW_PRESS) return;
 
     switch (key) {
-    case GLFW_KEY_ESCAPE:
-        glfwSetWindowShouldClose(window->handle, GLFW_TRUE);
-        break;
-    
-    case GLFW_KEY_D:
-        game_toggle_difficulty();
-        break;
+        case GLFW_KEY_ESCAPE:
+            glfwSetWindowShouldClose(window.handle, GLFW_TRUE);
+            break;
+        
+        case GLFW_KEY_D:
+            game_toggle_difficulty();
+            break;
+            
+        case GLFW_KEY_N:
+            game_new();
+            break;
     }
 }
 
-void window_mouse_button_callback(GLFWwindow *win, int btn, int act, int mods)
+static void
+mouse_button_callback(GLFWwindow *win, int btn, int act, int mods)
 {
     bool pressed = (act == GLFW_PRESS);
-    window_t window = glfwGetWindowUserPointer(win);
 
     switch (btn) {
-    case GLFW_MOUSE_BUTTON_RIGHT:
-        game_on_right_click(window->cursor.x, window->cursor.y, pressed);
-        break;
-    
-    case GLFW_MOUSE_BUTTON_LEFT:
-        game_on_left_click(window->cursor.x, window->cursor.y, pressed);
-        break;
+        case GLFW_MOUSE_BUTTON_RIGHT:
+            game_on_right_click(window.cursor.x, window.cursor.y, pressed);
+            break;
+        
+        case GLFW_MOUSE_BUTTON_LEFT:
+            game_on_left_click(window.cursor.x, window.cursor.y, pressed);
+            break;
     }
 }
 
-void window_init(void)
+void window_initialize(void)
 {
+    GLFWimage image;
     const GLFWvidmode *video_mode;
 
     if (window.initialized) {
@@ -71,19 +75,24 @@ void window_init(void)
     window.width *= window.scale;
     window.height *= window.scale;
 
-    window.handle = glfwCreateWindow(window.width, window.height, WINDOW_NAME,
-                                     NULL, NULL);
+    window.handle = glfwCreateWindow(window.width, window.height,
+                                     WINDOW_NAME, NULL, NULL);
 
     if (window.handle == NULL) {
         glfwTerminate();
         logger_fatal("Window creation error");
     }
 
-    glfwSetWindowUserPointer(window.handle, &window);
+    glfwSetKeyCallback(window.handle, key_callback);
+    glfwSetCursorPosCallback(window.handle, cursor_pos_callback);
+    glfwSetMouseButtonCallback(window.handle, mouse_button_callback);
 
-    glfwSetKeyCallback(window.handle, window_key_callback);
-    glfwSetCursorPosCallback(window.handle, window_cursor_pos_callback);
-    glfwSetMouseButtonCallback(window.handle, window_mouse_button_callback);
+    image.pixels = stbi_load(ASSETS_DIR"/icon.png", &image.width,
+                             &image.height, NULL, STBI_rgb_alpha);
+
+    glfwSetWindowIcon(window.handle, 1, &image);
+
+    stbi_image_free(image.pixels);
 
     glfwMakeContextCurrent(window.handle);
 
@@ -92,7 +101,7 @@ void window_init(void)
     window.initialized = true;
 }
 
-void window_normalized_resize(int width, int height)
+void window_resize_with_normalized_sizes(int width, int height)
 {
     window.width = width * window.scale;
     window.height = height * window.scale;
@@ -111,8 +120,8 @@ void window_normalized_resize(int width, int height)
 
 void window_normalize_pos(int *x, int *y)
 {
-    *x = ((int) (*x / window_instance()->scale));
-    *y = ((int) (*y / window_instance()->scale));
+    *x = ((int) (*x / window.scale));
+    *y = ((int) (*y / window.scale));
 }
 
 void window_free(void)

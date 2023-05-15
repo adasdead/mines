@@ -13,8 +13,8 @@
 
 static void shuffle(int *array, size_t size)
 {
-    int tmp;
     size_t i, j;
+    int tmp;
 
     if (array == NULL || size <= 1) return;
 
@@ -33,48 +33,28 @@ field_t field_create(uint width, uint height, uint mines)
 {
     field_t field = malloc(sizeof *field);
 
-    if (field == NULL) {
+    if (field == NULL)
         logger_fatal("Failed to allocate memory for field");
-    }
 
     field->height = height;
     field->width = width;
     field->mines = mines;
     field->size = width * height;
-    field->cells = calloc(width * height, sizeof *(field->cells));
 
-    /*** Gen OpenGL buffers ***/
+    field->cells = calloc(field->size, sizeof *(field->cells));
 
-    glGenBuffers(1, &field->render.VBO);
-    glGenVertexArrays(1, &field->render.VAO);
+    renderer_titles_initialize(&field->renderer, width, height);
 
-    glBindBuffer(GL_ARRAY_BUFFER, field->render.VBO);
-    glBufferData(GL_ARRAY_BUFFER, width * height, NULL, GL_STATIC_DRAW);
-
-    glBindVertexArray(field->render.VAO);
-    glEnableVertexAttribArray(0);
-    glVertexAttribIPointer(0, 1, GL_UNSIGNED_BYTE, sizeof(uint8_t), NULL);
-    glBindBuffer(GL_ARRAY_BUFFER, GL_NONE);
-    glBindVertexArray(GL_NONE);
-
-    logger_info("Field(%ux%u | %u mines) created!", width, height, mines);
+    logger_info("Field(%ux%u | %u mines) created!", width, height,
+                mines);
 
     return field;
 }
 
-bool field_is_include(const field_t field, int x, int y)
-{
-    return (x < field->width) && (y < field->height) &&
-           (x >= 0)           && (y >= 0);
-}
-
 cell_t field_cell(field_t field, int x, int y)
 {
-    if (field != NULL && x >= 0 && x < field->width &&
-                         y >= 0 && y < field->height) {
-
+    if (field != NULL && field_is_within(field, x, y))
         return field->cells + (field->width * y + x);
-    }
 
     return NULL;
 }
@@ -131,19 +111,16 @@ size_t field_adjacent_mines(field_t field, uint x, uint y)
 {
     cell_t cell;
     size_t mines = 0;
-    int off_x, off_y;
+    int i, j; /* offsets */
 
-    for (off_x = -1; off_x <= 1; ++off_x) {
-        for (off_y = -1; off_y <= 1; ++off_y) {
-            if (off_x == 0 && off_y == 0) {
-                continue;
-            }
+    for (i = -1; i <= 1; ++i) {
+        for (j = -1; j <= 1; ++j) {
+            if (i == 0 && j == 0) continue;
             
-            cell = field_cell(field, x + off_x, y + off_y);
+            cell = field_cell(field, x + i, y + j);
 
-            if (cell != NULL) {
-                mines += (cell->type == CELL_TYPE_BOMB);
-            }
+            if (cell != NULL && cell->type == CELL_TYPE_BOMB)
+                mines += 1;
         }
     }
 
@@ -152,13 +129,14 @@ size_t field_adjacent_mines(field_t field, uint x, uint y)
 
 void field_render(field_t field, mat4 projection)
 {
-    window_t window = window_instance();
     shader_t shader = resources_shader(RS_SHADER_FIELD);
-    int cur_x = window->cursor.x, cur_y = window->cursor.y;
+    int cur_x = window_instance()->cursor.x;
+    int cur_y = window_instance()->cursor.y;
 
     if (field == NULL || projection == NULL) return;
 
-    field_normalize_pos(&cur_x, &cur_y);
+    window_normalize_pos(&cur_x, &cur_y);
+    field_shift_pos(&cur_x, &cur_y);
     
     shader_use(shader);
     shader_set_uniform_m4fv(shader, "u_projection", projection);
@@ -169,27 +147,20 @@ void field_render(field_t field, mat4 projection)
 
     texture_bind(resources_texture_atlas());
 
-    glBindBuffer(GL_ARRAY_BUFFER, field->render.VBO);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, field->size * sizeof(GLubyte),
-                    field->cells);
-    glBindBuffer(GL_ARRAY_BUFFER, GL_NONE);
-
-    glBindVertexArray(field->render.VAO);
-    glDrawArrays(GL_POINTS, 0, field->size);
-    glBindVertexArray(GL_NONE);
+    renderer_titles_draw(&field->renderer, (byte*) field->cells,
+                         field->size);
 }
 
 void field_clear(field_t field)
 {
-    if (field != NULL) {
+    if (field != NULL)
         memset(field->cells, CELL_STATE_CLOSED, field->size);
-    }
 }
 
 void field_free(field_t field)
 {
     if (field != NULL) {
-        OPENGL_RENDER_FREE(field);
+        renderer_free(&field->renderer);
         free(field->cells);
         free(field);
     }

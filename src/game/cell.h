@@ -3,26 +3,30 @@
 
 #include "util/basic_types.h"
 
-#define CELL_STATE_CLOSED               0
-#define CELL_STATE_OPENED               1
-#define CELL_STATE_FLAGGED              2
-#define CELL_STATE_QUESTIONED           3
+enum cell_states {
+    CELL_STATE_CLOSED,
+    CELL_STATE_OPENED,
+    CELL_STATE_FLAGGED,
+    CELL_STATE_QUESTIONED,
+};
 
-#define CELL_TYPE_EMPTY                 0
-#define CELL_TYPE_1                     1
-#define CELL_TYPE_2                     2
-#define CELL_TYPE_3                     3
-#define CELL_TYPE_4                     4
-#define CELL_TYPE_5                     5
-#define CELL_TYPE_6                     6
-#define CELL_TYPE_7                     7
-#define CELL_TYPE_8                     8
-#define CELL_TYPE_BOMB                  9
-#define CELL_TYPE_NO_BOMB               10
-#define CELL_TYPE_BOMB_E                11
-#define CELL_TYPE_CLOSE                 12
-#define CELL_TYPE_QUESTION              13
-#define CELL_TYPE_FLAG                  14
+enum cell_types {
+    CELL_TYPE_EMPTY,
+    CELL_TYPE_1,
+    CELL_TYPE_2,
+    CELL_TYPE_3,
+    CELL_TYPE_4,
+    CELL_TYPE_5,
+    CELL_TYPE_6,
+    CELL_TYPE_7,
+    CELL_TYPE_8,
+    CELL_TYPE_BOMB,
+    CELL_TYPE_NO_BOMB,
+    CELL_TYPE_BOMB_E,
+    CELL_TYPE_CLOSE,
+    CELL_TYPE_QUESTION,
+    CELL_TYPE_FLAG,
+};
 
 struct cell {
     byte                type  : 4;

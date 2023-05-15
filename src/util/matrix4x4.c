@@ -8,9 +8,8 @@ mat4 matrix4x4_allocate(void)
 {
     mat4 mat = calloc(MATRIX4X4_SIZE, sizeof *mat);
 
-    if (mat == NULL) {
+    if (mat == NULL)
         logger_fatal("Failed to allocate memory for matrix4x4");
-    }
 
     return mat;
 }
@@ -58,16 +57,13 @@ mat4 matrix4x4_mult(mat4 restrict dest, const mat4 src)
 
 void matrix4x4_free(mat4 mat)
 {
-    if (mat != NULL) {
-        free(mat);
-    }
+    if (mat != NULL) free(mat);
 }
 
 void matrix4x4_set(mat4 matrix, uint i, uint j, float value)
 {
-    if (matrix != NULL) {
+    if (matrix != NULL)
         matrix[MATRIX4X4_WIDTH * i + j] = value;
-    }
 }
 
 float matrix4x4_get(const mat4 matrix, uint i, uint j)

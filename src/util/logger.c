@@ -12,49 +12,50 @@
 
 #define FORMAT                                  "[%s:%zu] %s%s"ANSI_RESET" "
 
-static void get_color_and_status(enum logger_level level, const char **color,
-                                 const char **status)
+static void
+get_color_and_status(enum logger_level level, const char **color,
+                     const char **status)
 {
     switch (level) {
-    case LOGGER_WARN:
-        *color = ANSI_YLW_BACKGROUND;
-        *status = "WARN";
-        break;
-        
-    case LOGGER_FATAL:
-        *color = ANSI_RED_BACKGROUND;
-        *status = "!FATAL!";
-        break;
+        case LOGGER_WARN:
+            *color = ANSI_YLW_BACKGROUND;
+            *status = "WARN";
+            break;
+            
+        case LOGGER_FATAL:
+            *color = ANSI_RED_BACKGROUND;
+            *status = "!FATAL!";
+            break;
 
-    default:
-    case LOGGER_INFO:
-        *color = ANSI_GRN_BACKGROUND;
-        *status = "INFO";
+        default:
+        case LOGGER_INFO:
+            *color = ANSI_GRN_BACKGROUND;
+            *status = "INFO";
     }
 }
 
-void logger_log(enum logger_level level, const char *file_name,
-                size_t line_no, const char *restrict format, ...)
+void
+logger_log(enum logger_level level, const char *file_name, size_t line_no,
+           const char *restrict format, ...)
 {
     const char *background_color, *status;
-    FILE *stream = stdout;
+    FILE *output_stream = stdout;
     va_list args_list;
 
     va_start(args_list, format);
 
-    if (strrchr(file_name, PATH_SEPARATOR) != NULL) {
+    if (strrchr(file_name, PATH_SEPARATOR) != NULL)
         file_name = strrchr(file_name, PATH_SEPARATOR) + 1;
-    }
 
-    if (level == LOGGER_WARN || level == LOGGER_FATAL) {
-        stream = stderr;
-    }
+    if (level == LOGGER_WARN || level == LOGGER_FATAL)
+        output_stream = stderr;
 
     get_color_and_status(level, &background_color, &status);
 
-    fprintf(stream, FORMAT, file_name, line_no, background_color, status);
-    vfprintf(stream, format, args_list);
-    fputc('\n', stream);
+    fprintf(output_stream, FORMAT, file_name, line_no,
+            background_color, status);
+    vfprintf(output_stream, format, args_list);
+    fputc('\n', output_stream);
 
     va_end(args_list);
 }

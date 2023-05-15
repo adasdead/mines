@@ -35,6 +35,8 @@
         "functional": "c",
         "tuple": "c",
         "utility": "c",
-        "string.h": "c"
+        "string.h": "c",
+        "rendering.h": "c",
+        "math.h": "c"
     }
 }

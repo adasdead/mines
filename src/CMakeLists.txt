@@ -11,6 +11,7 @@ endif()
 target_sources(${PROJECT_NAME} PRIVATE
     graphics/shader.c
     graphics/texture.c
+    graphics/renderer.c
 
     util/resources.c
     util/matrix4x4.c

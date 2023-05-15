@@ -13,13 +13,12 @@ static void on_glfw_error_callback(int code, const char *message)
 
 int main(void)
 {
-    if (!glfwInit()) {
+    if (!glfwInit())
         logger_fatal("GLFW initialization failed");
-    }
 
     glfwSetErrorCallback(on_glfw_error_callback);
 
-    window_init();
+    window_initialize();
 
     if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {
         window_free();
@@ -30,7 +29,7 @@ int main(void)
     glfwSwapInterval(1);
 
     resources_load();
-    game_init();
+    game_initialize();
 
     while (!glfwWindowShouldClose(window_instance()->handle)) {
         glClearColor(1.0f, 0.5f, 1.0f, 1.0f);

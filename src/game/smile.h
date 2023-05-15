@@ -1,7 +1,7 @@
 #ifndef GAME_SMILE_H
 #define GAME_SMILE_H
 
-#include "graphics/opengl.h"
+#include "graphics/renderer.h"
 
 #include "util/matrix4x4.h"
 #include "util/basic_types.h"
@@ -16,21 +16,22 @@ enum smile_state {
 };
 
 struct smile {
-    float               x;
     enum smile_state    state;
-    mat4                model;
+    float               x;
     
     void (*click_callback)(void);
 
-    OPENGL_RENDER_STRUCT;
+    mat4                model;
+    struct renderer     renderer;
 };
 
 typedef struct smile *smile_t;
 
 smile_t smile_create(void (*click_callback)(void));
-void smile_update_width(smile_t smile, uint width);
+
+void smile_update_model_matrix(smile_t smile);
 void smile_render(const smile_t smile, mat4 projection);
-void smile_mouse(smile_t smile, uint x, uint y, bool press);
+void smile_handle_mouse(smile_t smile, uint x, uint y, bool press);
 void smile_free(smile_t smile);
 
 #endif /* GAME_SMILE_H */

@@ -5,13 +5,13 @@
 #include "util/basic_types.h"
 
 void game_new(void);
-void game_init(void);
+void game_toggle_difficulty(void);
+
+void game_initialize(void);
 void game_loop(void);
 
 void game_on_left_click(int x, int y, bool press);
 void game_on_right_click(int x, int y, bool press);
-
-void game_toggle_difficulty(void);
 
 void game_free(void);
 

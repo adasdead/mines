@@ -1,7 +1,7 @@
 #ifndef GAME_FIELD_H
 #define GAME_FIELD_H
 
-#include "graphics/opengl.h"
+#include "graphics/renderer.h"
 
 #include "game/window.h"
 #include "game/cell.h"
@@ -19,25 +19,27 @@ struct field {
     uint                height;
     uint                mines;
 
-    struct cell         *cells;
+    struct cell        *cells;
 
-    OPENGL_RENDER_STRUCT;
+    struct renderer     renderer;
 };
 
 typedef struct field *field_t;
 
-static inline void field_normalize_pos(int *x, int *y)
+static inline void field_shift_pos(int *x, int *y)
 {
-    if (x == NULL || y == NULL) return;
-
-    window_normalize_pos(x, y);
-
     *x -= FIELD_LX;
     *y -= FIELD_LY;
 }
 
+static inline bool field_is_within(const field_t field,
+                                   int x, int y)
+{
+    return (x >= 0) && (x < field->width) &&
+           (y >= 0) && (y < field->height);
+}
+
 field_t field_create(uint width, uint height, uint mines);
-bool field_is_include(const field_t field, int x, int y);
 cell_t field_cell(field_t field, int x, int y);
 void field_generate(field_t field, uint x, uint y);
 size_t field_adjacent_mines(field_t field, uint x, uint y);

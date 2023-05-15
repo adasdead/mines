@@ -6,7 +6,7 @@
 
 #include "util/logger.h"
 
-static char *read_strings_from_file(const char *file_path)
+static char *read_file_to_string(const char *file_path)
 {
     FILE *fp = fopen(file_path, "rb");
     char *buffer = NULL;
@@ -23,19 +23,18 @@ static char *read_strings_from_file(const char *file_path)
 
         buffer[buffer_size] = 0;
     }
-    else {
+    else
         logger_warn("IO Error [%s]: %s", file_path, strerror(errno));
-    }
 
     return buffer;
 }
 
-static bool shader_check(GLuint id, const char *file_path)
+static bool check_errors(GLuint id, const char *file_path)
 {
     int status;
     char info_buffer[1024];
 
-    if (glIsShader(id)) {
+    if (glIsShader(id) == GL_TRUE) {
         glGetShaderiv(id, GL_COMPILE_STATUS, &status);
 
         if (status == GL_FALSE) {
@@ -45,7 +44,7 @@ static bool shader_check(GLuint id, const char *file_path)
             return false;
         }
     }
-    else if (glIsProgram(id)) {
+    else if (glIsProgram(id) == GL_TRUE) {
         glGetProgramiv(id, GL_LINK_STATUS, &status);
 
         if (status == GL_FALSE) {
@@ -65,14 +64,14 @@ static GLuint shader_create(const char *file_path, GLenum type)
 
     if (file_path != NULL) {
         shader = glCreateShader(type);
-        source_buffer = read_strings_from_file(file_path);
+        source_buffer = read_file_to_string(file_path);
 
         glShaderSource(shader, 1, (const char**) &source_buffer, NULL);
         glCompileShader(shader);
 
         free(source_buffer);
 
-        return shader_check(shader, file_path) ? shader : GL_NONE;
+        return check_errors(shader, file_path) ? shader : GL_NONE;
     }
 
     return GL_NONE;
@@ -89,15 +88,16 @@ shader_t shader_load_g(const char *vertex_path, const char *fragment_path,
     glAttachShader(program, frag);
     glAttachShader(program, vert);
     
-    if (geom != GL_NONE) {
+    if (geom != GL_NONE)
         glAttachShader(program, geom);
-    }
 
     glLinkProgram(program);
 
-    shader_check(program, "");
+    check_errors(program, "");
 
-    glDeleteShader(geom);
+    if (geom != GL_NONE)
+        glDeleteShader(geom);
+
     glDeleteShader(vert);
     glDeleteShader(frag);
 

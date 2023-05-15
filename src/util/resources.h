@@ -13,8 +13,8 @@ enum resources_shader_type {
 };
 
 void resources_load(void);
-texture_t resources_texture_atlas(void);
 shader_t resources_shader(enum resources_shader_type type);
+texture_t resources_texture_atlas(void);
 void resources_free(void);
 
 #endif /* UTIL_RESOURCES_H */

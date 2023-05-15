@@ -20,11 +20,11 @@ struct window {
 
 typedef struct window *window_t;
 
-void window_init(void);
-void window_normalized_resize(int width, int height);
+void window_initialize(void);
+void window_resize_with_normalized_sizes(int width, int height);
 void window_normalize_pos(int *x, int *y);
 void window_free(void);
 
-window_t window_instance(void);
+const window_t window_instance(void);
 
 #endif /* GAME_WINDOW_H */

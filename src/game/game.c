@@ -13,95 +13,103 @@
 
 #include "definitions.h"
 
-#define GAME_IS_OVER                                                        \
-    ((state == GAME_STATE_LOSE) || (state == GAME_STATE_WON))
+enum game_state {
+    GAME_STATE_IDLE,
+    GAME_STATE_STARTED,
+    GAME_STATE_LOSE,
+    GAME_STATE_WON
+};
 
-static time_t start_time;
+static struct {
+    field_t field;
+    smile_t smile;
+    counter_t mine_counter;
+    counter_t time_counter;
+    border_t border;
+} objects = { NULL };
+
+static time_t start_time = 0;
 static size_t opened_cells = 0;
-
 static uint current_difficulty = 0;
 
-/* objects */
-static field_t field = NULL;
-static smile_t smile = NULL;
-static counter_t mine_counter = NULL;
-static counter_t time_counter = NULL;
-static border_t border = NULL;
+static enum game_state state = GAME_STATE_IDLE;
 
-enum game_state {
-    GAME_STATE_STARTED, GAME_STATE_IDLE, GAME_STATE_LOSE, GAME_STATE_WON
-} static state = GAME_STATE_IDLE;
-
-static void check_lose(cell_t cell)
+static inline bool game_is_over(void)
 {
-    int x, y;
-
-    if (cell->type == CELL_TYPE_BOMB) {
-        cell->state = CELL_STATE_OPENED;
-        cell->type = CELL_TYPE_BOMB_E;
-
-        for (x = 0; x < field->width; ++x) {
-            for (y = 0; y < field->height; ++y) {
-                cell = field_cell(field, x, y);
-
-                if (cell->state == CELL_STATE_FLAGGED) {
-                    if (cell->type != CELL_TYPE_BOMB) {
-                        cell->state = CELL_STATE_OPENED;
-                        cell->type = CELL_TYPE_NO_BOMB;
-                        continue;
-                    }
-
-                    if (cell->type == CELL_TYPE_BOMB) {
-                        continue;
-                    }
-                }
-
-                cell->state = CELL_STATE_OPENED;
-            }
-        }
-
-        smile->state = SMILE_STATE_DEAD;
-        state = GAME_STATE_LOSE;
-        
-        logger_info("Lose");
-    }
+    return (state == GAME_STATE_LOSE) || (state == GAME_STATE_WON);
 }
 
-static void check_won(void)
+static void game_lose(void)
 {
     int x, y;
     cell_t cell;
 
-    if (state == GAME_STATE_LOSE) return;
+    objects.smile->state = SMILE_STATE_DEAD;
 
-    if (field->mines == (field->size - opened_cells)) {
-        for (x = 0; x < field->width; ++x) {
-            for (y = 0; y < field->height; ++y) {
-                cell = field_cell(field, x, y);
+    for (x = 0; x < objects.field->width; ++x) {
+        for (y = 0; y < objects.field->height; ++y) {
+            cell = field_cell(objects.field, x, y);
 
-                if (cell->state == CELL_STATE_CLOSED) {
-                    cell->state = CELL_STATE_FLAGGED;
+            if (cell->state == CELL_STATE_FLAGGED) {
+                if (cell->type != CELL_TYPE_BOMB) {
+                    cell->state = CELL_STATE_OPENED;
+                    cell->type = CELL_TYPE_NO_BOMB;
+                    continue;
+                }
+
+                if (cell->type == CELL_TYPE_BOMB) {
+                    continue;
                 }
             }
+
+            cell->state = CELL_STATE_OPENED;
         }
-
-        smile->state = SMILE_STATE_COOL;
-        state = GAME_STATE_WON;
-        mine_counter->value = 0;
-
-        logger_info("Won");
     }
+    
+    state = GAME_STATE_LOSE;
+
+    logger_info("Lose");
+}
+
+static void game_won(void)
+{
+    int x, y;
+    cell_t cell;
+
+    for (x = 0; x < objects.field->width; ++x) {
+        for (y = 0; y < objects.field->height; ++y) {
+            cell = field_cell(objects.field, x, y);
+
+            if (cell->state == CELL_STATE_CLOSED) {
+                cell->state = CELL_STATE_FLAGGED;
+            }
+        }
+    }
+
+    objects.smile->state = SMILE_STATE_COOL;
+    objects.mine_counter->value = 0;
+    state = GAME_STATE_WON;
+
+    logger_info("Won");
 }
 
 static void open_cell(int x, int y)
 {
-    int i, j;
+    field_t field = objects.field;
     cell_t cell = field_cell(field, x, y);
+    int i, j; /* offsets */
 
     if (cell != NULL) {
         if (cell->state == CELL_STATE_OPENED) return;
         if (cell->state == CELL_STATE_FLAGGED) return;
-        if (GAME_IS_OVER) return;
+        if (game_is_over()) return;
+
+        if (cell->type == CELL_TYPE_BOMB) {
+            cell->state = CELL_STATE_OPENED;
+            cell->type = CELL_TYPE_BOMB_E;
+            game_lose();
+            return;
+        }
 
         cell->state = CELL_STATE_OPENED;
         opened_cells++;
@@ -115,55 +123,63 @@ static void open_cell(int x, int y)
             }
         }
 
-        check_lose(cell);
-        check_won();
+        if (field->mines == (field->size - opened_cells))
+            game_won();
     }
 }
 
-static void game_update_objects(void)
+static void update_objects(void)
 {
-    float x_offset;
-    int width, height;
+    difficulty_t difficulty = DIFFICULTY(current_difficulty);
+    uint width, height;
 
-    field_free(field);
+    static const float x_offset = COUNTER_NUMBERS * COUNTER_WIDTH +
+                                  COUNTER_OFFSET_LRX;
 
-    field = field_create(DIFFICULTY(current_difficulty)->field_width,
-                         DIFFICULTY(current_difficulty)->field_height,
-                         DIFFICULTY(current_difficulty)->mines_count);
+    field_free(objects.field);
+
+    objects.field = field_create(difficulty->field_width,
+                                 difficulty->field_height,
+                                 difficulty->mines_count);
     
-    width = FIELD_LX + FIELD_RX + field->width;
-    height = FIELD_LY + FIELD_RY + field->height;
+    width = FIELD_LX + objects.field->width + FIELD_RX;
+    height = FIELD_LY + objects.field->height + FIELD_RY;
 
-    window_normalized_resize(width, height);
+    window_resize_with_normalized_sizes(width, height);
 
-    x_offset = COUNTER_NUMBERS * COUNTER_WIDTH + COUNTER_OFFSET_LRX;
+    objects.time_counter->x = width - x_offset - FIELD_RX;
+    counter_update_model_matrices(objects.time_counter);
 
-    counter_update_model_matrices(time_counter, width - x_offset - FIELD_RX);
+    objects.smile->x = (width / 2.0f) - 1.0f;
+    smile_update_model_matrix(objects.smile);
 
-    smile_update_width(smile, width);
-    border_update_frame(border, width, height);
+    border_update(objects.border, width, height);
 }
 
 void game_new(void)
 {
-    field_clear(field);
-    smile->state = SMILE_STATE_DEFAULT;
-    mine_counter->value = field->mines;
-    time_counter->value = opened_cells = 0;
+    field_clear(objects.field);
+    objects.smile->state = SMILE_STATE_DEFAULT;
+    objects.mine_counter->value = objects.field->mines;
+    objects.time_counter->value = opened_cells = 0;
     state = GAME_STATE_IDLE;
 
     logger_info("New game");
 }
 
-void game_init(void)
+void game_initialize(void)
 {
-    smile = smile_create(game_new);
-    mine_counter = counter_create();
-    counter_update_model_matrices(mine_counter, FIELD_LX + COUNTER_OFFSET_LRX);
-    time_counter = counter_create();
-    border = border_create();
+    objects.smile = smile_create(game_new);
 
-    game_update_objects();
+    objects.mine_counter = counter_create();
+    objects.mine_counter->x = FIELD_LX + COUNTER_OFFSET_LRX;
+    counter_update_model_matrices(objects.mine_counter);
+
+    objects.time_counter = counter_create();
+
+    objects.border = border_create();
+
+    update_objects();
     game_new();
 }
 
@@ -172,27 +188,28 @@ void game_loop(void)
     window_t window = window_instance();
 
     if (state == GAME_STATE_STARTED) {
-        time_counter->value = time(NULL) - start_time;
+        objects.time_counter->value = time(NULL) - start_time;
     }
 
-    border_render(border, window->projection);
-    field_render(field, window->projection);
-    smile_render(smile, window->projection);
-    counter_render(mine_counter, window->projection);
-    counter_render(time_counter, window->projection);
+    border_render(objects.border, window->projection);
+    field_render(objects.field, window->projection);
+    smile_render(objects.smile, window->projection);
+    counter_render(objects.mine_counter, window->projection);
+    counter_render(objects.time_counter, window->projection);
 }
 
 void game_on_left_click(int x, int y, bool press)
 {
-    smile_mouse(smile, x, y, press);
+    smile_handle_mouse(objects.smile, x, y, press);
 
-    field_normalize_pos(&x, &y);
+    window_normalize_pos(&x, &y);
+    field_shift_pos(&x, &y);
 
-    if (!field_is_include(field, x, y)) return;
+    if (!field_is_within(objects.field, x, y)) return;
 
     if (press && state != GAME_STATE_LOSE) {
         if (state == GAME_STATE_IDLE) {
-            field_generate(field, x, y);
+            field_generate(objects.field, x, y);
             start_time = time(NULL);
             state = GAME_STATE_STARTED;
         }
@@ -205,26 +222,28 @@ void game_on_right_click(int x, int y, bool press)
 {
     cell_t cell;
 
-    if (!GAME_IS_OVER) {
-        field_normalize_pos(&x, &y);
+    if (game_is_over() == false) {
+        window_normalize_pos(&x, &y);
+        field_shift_pos(&x, &y);
 
-        if (!field_is_include(field, x, y)) return;
+        if (!field_is_within(objects.field, x, y))
+            return;
 
         if (press) {
-            cell = field_cell(field, x, y);
+            cell = field_cell(objects.field, x, y);
 
             switch (cell->state) {
-            case CELL_STATE_CLOSED:
-                cell->state = CELL_STATE_FLAGGED;
-                mine_counter->value -= 1;
-                return;
-            case CELL_STATE_FLAGGED:
-                cell->state = CELL_STATE_QUESTIONED;
-                mine_counter->value += 1;
-                return;
-            case CELL_STATE_QUESTIONED:
-                cell->state = CELL_STATE_CLOSED;
-                return;
+                case CELL_STATE_CLOSED:
+                    cell->state = CELL_STATE_FLAGGED;
+                    objects.mine_counter->value -= 1;
+                    return;
+                case CELL_STATE_FLAGGED:
+                    cell->state = CELL_STATE_QUESTIONED;
+                    objects.mine_counter->value += 1;
+                    return;
+                case CELL_STATE_QUESTIONED:
+                    cell->state = CELL_STATE_CLOSED;
+                    return;
             }
         }
     }
@@ -232,23 +251,24 @@ void game_on_right_click(int x, int y, bool press)
 
 void game_toggle_difficulty(void)
 {
-    const char *difficulty_name;
+    uint current = current_difficulty;
+    difficulty_t difficulty = DIFFICULTY((current + 1));
+    current_difficulty = difficulty->id;
 
-    current_difficulty = (current_difficulty + 1) % DIFFICULTY_TOTAL;
+#if DEBUG
+    logger_info("Difficulty changed to %s",
+                difficulty_name(difficulty));
+#endif /* DEBUG */
     
-    difficulty_name = DIFFICULTY(current_difficulty)->name;
-
-    logger_info("Difficulty changed to %s", difficulty_name);
-    
-    game_update_objects();
+    update_objects();
     game_new();
 }
 
 void game_free(void)
 {
-    field_free(field);
-    smile_free(smile);
-    counter_free(mine_counter);
-    counter_free(time_counter);
-    border_free(border);
+    field_free(objects.field);
+    smile_free(objects.smile);
+    counter_free(objects.mine_counter);
+    counter_free(objects.time_counter);
+    border_free(objects.border);
 }
