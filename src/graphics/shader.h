@@ -1,3 +1,8 @@
+/* 
+ * Copyright (c) 2023 adasdead
+ * This software is licensed under the MIT License. (see the LICENSE file)
+ */
+
 #ifndef GRAPHICS_SHADER_H
 #define GRAPHICS_SHADER_H
 

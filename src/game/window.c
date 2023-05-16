@@ -1,3 +1,8 @@
+/* 
+ * Copyright (c) 2023 adasdead
+ * This software is licensed under the MIT License. (see the LICENSE file)
+ */
+
 #include "window.h"
 
 #include <stb/stb_image.h>
@@ -30,7 +35,7 @@ key_callback(GLFWwindow *win, int key, int code, int act, int mods)
         case GLFW_KEY_D:
             game_toggle_difficulty();
             break;
-            
+
         case GLFW_KEY_N:
             game_new();
             break;
@@ -132,7 +137,7 @@ void window_free(void)
     }
 }
 
-window_t window_instance(void)
+const window_t window_get_instance(void)
 {
     return &window;
 }

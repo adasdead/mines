@@ -1,3 +1,8 @@
+/* 
+ * Copyright (c) 2023 adasdead
+ * This software is licensed under the MIT License. (see the LICENSE file)
+ */
+
 #include "field.h"
 
 #include <stdlib.h>
@@ -27,6 +32,17 @@ static void shuffle(int *array, size_t size)
         array[j] = array[i];
         array[i] = tmp;
     }
+}
+
+/* Gets the current cursor position in the field coordinates. */
+static void get_cursor_pos_in_field(int *x, int *y)
+{
+    *x = window_get_instance()->cursor.x;
+    *y = window_get_instance()->cursor.y;
+
+    window_normalize_pos(x, y);
+
+    field_shift_pos(x, y);
 }
 
 field_t field_create(uint width, uint height, uint mines)
@@ -129,21 +145,19 @@ size_t field_adjacent_mines(field_t field, uint x, uint y)
 
 void field_render(field_t field, mat4 projection)
 {
+    int cursor_x, cursor_y;
     shader_t shader = resources_shader(RS_SHADER_FIELD);
-    int cur_x = window_instance()->cursor.x;
-    int cur_y = window_instance()->cursor.y;
 
     if (field == NULL || projection == NULL) return;
 
-    window_normalize_pos(&cur_x, &cur_y);
-    field_shift_pos(&cur_x, &cur_y);
+    get_cursor_pos_in_field(&cursor_x, &cursor_y);
     
     shader_use(shader);
     shader_set_uniform_m4fv(shader, "u_projection", projection);
     shader_set_uniform_2i(shader, "u_field_size", field->width,
                                                   field->height);
     shader_set_uniform_2i(shader, "u_field_pos", FIELD_LX, FIELD_LY);
-    shader_set_uniform_2i(shader, "u_mouse_pos", cur_x, cur_y);
+    shader_set_uniform_2i(shader, "u_mouse_pos", cursor_x, cursor_y);
 
     texture_bind(resources_texture_atlas());
 

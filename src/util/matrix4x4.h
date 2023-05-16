@@ -1,3 +1,8 @@
+/* 
+ * Copyright (c) 2023 adasdead
+ * This software is licensed under the MIT License. (see the LICENSE file)
+ */
+
 #ifndef MATH_MATRIX4X4_H
 #define MATH_MATRIX4X4_H
 

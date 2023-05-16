@@ -1,3 +1,8 @@
+/* 
+ * Copyright (c) 2023 adasdead
+ * This software is licensed under the MIT License. (see the LICENSE file)
+ */
+
 #include "graphics/opengl.h"
 
 #include "game/game.h"
@@ -31,13 +36,13 @@ int main(void)
     resources_load();
     game_initialize();
 
-    while (!glfwWindowShouldClose(window_instance()->handle)) {
+    while (!glfwWindowShouldClose(window_get_instance()->handle)) {
         glClearColor(1.0f, 0.5f, 1.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
         game_loop();
 
-        glfwSwapBuffers(window_instance()->handle);
+        glfwSwapBuffers(window_get_instance()->handle);
         glfwPollEvents();
     }
 

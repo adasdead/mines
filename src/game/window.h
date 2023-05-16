@@ -1,3 +1,8 @@
+/* 
+ * Copyright (c) 2023 adasdead
+ * This software is licensed under the MIT License. (see the LICENSE file)
+ */
+
 #ifndef GAME_WINDOW_H
 #define GAME_WINDOW_H
 
@@ -25,6 +30,6 @@ void window_resize_with_normalized_sizes(int width, int height);
 void window_normalize_pos(int *x, int *y);
 void window_free(void);
 
-const window_t window_instance(void);
+const window_t window_get_instance(void);
 
 #endif /* GAME_WINDOW_H */

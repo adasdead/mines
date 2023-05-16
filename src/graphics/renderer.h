@@ -1,3 +1,8 @@
+/* 
+ * Copyright (c) 2023 adasdead
+ * This software is licensed under the MIT License. (see the LICENSE file)
+ */
+
 #ifndef GRAPHICS_RENDERER_H
 #define GRAPHICS_RENDERER_H
 

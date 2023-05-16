@@ -1,3 +1,8 @@
+/* 
+ * Copyright (c) 2023 adasdead
+ * This software is licensed under the MIT License. (see the LICENSE file)
+ */
+
 #include "game/game.h"
 
 #include <time.h>
@@ -185,7 +190,7 @@ void game_initialize(void)
 
 void game_loop(void)
 {
-    window_t window = window_instance();
+    window_t window = window_get_instance();
 
     if (state == GAME_STATE_STARTED) {
         objects.time_counter->value = time(NULL) - start_time;
