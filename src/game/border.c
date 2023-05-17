@@ -52,8 +52,8 @@ static void fill_frame(byte *frame, int width, int height)
     frame[width * height - 1] = BORDER_TT_CORBER_SE;
 
     /* Separators */
-    frame[width * BORDER_SEP_LY] = BORDER_TT_SEP_LEFT;
-    frame[width * BORDER_SEP_LY + (width - 1)] = BORDER_TT_SEP_RIGHT;
+    frame[width * BORDER_SEP_LY] = BORDER_TT_SEP_RIGHT;
+    frame[width * BORDER_SEP_LY + (width - 1)] = BORDER_TT_SEP_LEFT;
 }
 
 border_t border_create(void)

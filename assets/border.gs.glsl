@@ -8,31 +8,35 @@ in VS_OUT {
 
 out vec2 tex_coord;
 
-const float TILE_SIZE = 256.0;
+const float ATLAS_SIZE = 256.0;
+const float TILE_SIZE = 8.0;
 
 layout (points) in;
 layout (triangle_strip, max_vertices = 4) out;
 
 void main() {
-    float offset = 1 / TILE_SIZE;
-    float x = gs_in[0].tile / TILE_SIZE;
+    float offset = TILE_SIZE / ATLAS_SIZE;
+    float x = (gs_in[0].tile % 32) * offset;
+    float y = (gs_in[0].tile / 32) * offset;
+    y += 65 / ATLAS_SIZE;
+
     vec4 pos = gl_in[0].gl_Position;
-
+    
     gl_Position = u_projection * pos;
-    tex_coord = vec2(x, TILE_SIZE);
+    tex_coord = vec2(x, y);
     EmitVertex();
-
+    
     gl_Position = u_projection * (pos + vec4(1.0, 0.0, 0.0, 0.0));
-    tex_coord = vec2(x + offset, TILE_SIZE);
+    tex_coord = vec2(x + offset, y);
     EmitVertex();
-
+    
     gl_Position = u_projection * (pos + vec4(0.0, 1.0, 0.0, 0.0));
-    tex_coord = vec2(x, TILE_SIZE + offset);
+    tex_coord = vec2(x, y + offset);
     EmitVertex();
-
+    
     gl_Position = u_projection * (pos + vec4(1.0, 1.0, 0.0, 0.0));
-    tex_coord = vec2(x + offset, TILE_SIZE + offset);
+    tex_coord = vec2(x + offset, y + offset);
+    
     EmitVertex();
-
     EndPrimitive();
 }

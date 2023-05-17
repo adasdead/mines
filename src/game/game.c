@@ -138,7 +138,7 @@ static void update_objects(void)
     difficulty_t difficulty = DIFFICULTY(current_difficulty);
     uint width, height;
 
-    static const float x_offset = COUNTER_NUMBERS * COUNTER_WIDTH +
+    static const float x_offset = COUNTER_DIGITS * COUNTER_WIDTH +
                                   COUNTER_OFFSET_LRX;
 
     field_free(objects.field);

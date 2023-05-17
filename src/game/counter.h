@@ -22,8 +22,8 @@ struct counter {
     mat4               *models;
     struct renderer     renderer;
 
-    long long           value_max;
-    long long           digit_base[COUNTER_NUMBERS];
+    long long           max_value;
+    long long           digit_base[COUNTER_DIGITS];
 };
 
 typedef struct counter *counter_t;

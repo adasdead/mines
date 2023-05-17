@@ -12,7 +12,7 @@
  * Project definitions
  ***************************************************************************/
 
-#define WINDOW_NAME             "Minesweeper ["PROJECT_VERSION"]"
+#define WINDOW_NAME             "Minesweeper v"PROJECT_VERSION
 #define WINDOW_SCALE            33.75f
 
 #define ASSETS_DIR              "assets"
@@ -27,7 +27,7 @@
 #define SMILE_SCALE             1.655f
 
 #define COUNTER_LY              1
-#define COUNTER_NUMBERS         3
+#define COUNTER_DIGITS          3
 #define COUNTER_OFFSET_LRX      0.5f
 #define COUNTER_OFFSET_LY       0.25f
 #define COUNTER_WIDTH           0.82f

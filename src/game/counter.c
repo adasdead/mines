@@ -14,8 +14,8 @@
 #define MIN(a, b) ((a < b) ? (a) : (b))
 
 /*
- * Binary pow:
- * https://cp-algorithms.com/algebra/binary-exp.htm
+ * Binary Exponentiation:
+ * https://cp-algorithms.com/algebra/binary-exp.html
  */
 static long long b_pow(long long a, long long b)
 {
@@ -34,7 +34,7 @@ static long long b_pow(long long a, long long b)
 
 static inline int counter_value(const counter_t counter)
 {
-    return (int) MAX(MIN(counter->value_max, counter->value), 0);
+    return (int) MAX(MIN(counter->max_value, counter->value), 0);
 }
 
 counter_t counter_create(void)
@@ -45,20 +45,20 @@ counter_t counter_create(void)
     if (counter == NULL)
         logger_fatal("Failed to allocate memory for counter");
 
-    counter->models = calloc(COUNTER_NUMBERS, sizeof *counter->models);
+    counter->models = calloc(COUNTER_DIGITS, sizeof *counter->models);
 
-    for (i = 0; i < COUNTER_NUMBERS; i++) {
+    for (i = 0; i < COUNTER_DIGITS; i++) {
         counter->models[i] = matrix4x4_allocate();
     }
 
-    counter->value_max = b_pow(10, COUNTER_NUMBERS) - 1;
+    counter->max_value = b_pow(10, COUNTER_DIGITS) - 1;
 
     /*
      * fill the array of powers of ten for easy digit extraction in
      * the future
      */
-    for (i = 0; i < COUNTER_NUMBERS; i++) {
-        counter->digit_base[i] = b_pow(10, (COUNTER_NUMBERS - 1) - i);
+    for (i = 0; i < COUNTER_DIGITS; i++) {
+        counter->digit_base[i] = b_pow(10, (COUNTER_DIGITS - 1) - i);
     }
 
     renderer_basic_initialize(&counter->renderer);
@@ -72,7 +72,7 @@ void counter_update_model_matrices(counter_t counter)
     
     static const float y = COUNTER_LY + COUNTER_OFFSET_LY;
 
-    for (i = 0; i < COUNTER_NUMBERS; ++i, ++cur) {
+    for (i = 0; i < COUNTER_DIGITS; ++i, ++cur) {
         matrix4x4_identity(*cur);
         matrix4x4_scale(*cur, COUNTER_WIDTH, COUNTER_HEIGHT);
         /* shift each digit by COUNTER_WIDTH horizontally to draw */
@@ -93,7 +93,7 @@ void counter_render(const counter_t counter, mat4 projection)
 
     glBindVertexArray(counter->renderer.VAO);
 
-    for (i = 0; i < COUNTER_NUMBERS; ++i) {
+    for (i = 0; i < COUNTER_DIGITS; ++i) {
         digit = n / counter->digit_base[i] % 10; /* extract digit */
 
         shader_set_uniform_m4fv(shader, "u_model", counter->models[i]);
@@ -110,7 +110,7 @@ void counter_free(counter_t counter)
     size_t i;
 
     if (counter != NULL) {
-        for (i = 0; i < COUNTER_NUMBERS; ++i) {
+        for (i = 0; i < COUNTER_DIGITS; ++i) {
             matrix4x4_free(counter->models[i]);
         }
 
