@@ -1,6 +1,6 @@
 /* 
  * Copyright (c) 2023 adasdead
- * This software is licensed under the MIT License. (see the LICENSE file)
+ * This software is licensed under the MIT License.
  */
 
 #include "game/counter.h"
@@ -14,9 +14,28 @@
 #define MAX(a, b) ((a > b) ? (a) : (b))
 #define MIN(a, b) ((a < b) ? (a) : (b))
 
+/*
+ * Binary pow:
+ * https://cp-algorithms.com/algebra/binary-exp.htm
+ */
+static long long b_pow(long long a, long long b)
+{
+    long long res = 1;
+
+    while (b > 0) {
+        if (b & 1)
+            res = res * a;
+        
+        a *= a;
+        b >>= 1;
+    }
+
+    return res;
+}
+
 static inline int counter_value(const counter_t counter)
 {
-    return MAX(MIN(counter->value_max, counter->value), 0);
+    return (int) MAX(MIN(counter->value_max, counter->value), 0);
 }
 
 counter_t counter_create(void)
@@ -33,14 +52,14 @@ counter_t counter_create(void)
         counter->models[i] = matrix4x4_allocate();
     }
 
-    counter->value_max = pow(10, COUNTER_NUMBERS) - 1;
+    counter->value_max = b_pow(10, COUNTER_NUMBERS) - 1;
 
     /*
      * fill the array of powers of ten for easy digit extraction in
      * the future
      */
     for (i = 0; i < COUNTER_NUMBERS; i++) {
-        counter->digit_base[i] = pow(10, (COUNTER_NUMBERS - 1) - i);
+        counter->digit_base[i] = b_pow(10, (COUNTER_NUMBERS - 1) - i);
     }
 
     renderer_basic_initialize(&counter->renderer);

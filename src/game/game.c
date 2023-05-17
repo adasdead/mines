@@ -1,6 +1,6 @@
 /* 
  * Copyright (c) 2023 adasdead
- * This software is licensed under the MIT License. (see the LICENSE file)
+ * This software is licensed under the MIT License.
  */
 
 #include "game/game.h"
@@ -46,7 +46,7 @@ static inline bool game_is_over(void)
 
 static void game_lose(void)
 {
-    int x, y;
+    uint x, y;
     cell_t cell;
 
     objects.smile->state = SMILE_STATE_DEAD;
@@ -78,7 +78,7 @@ static void game_lose(void)
 
 static void game_won(void)
 {
-    int x, y;
+    uint x, y;
     cell_t cell;
 
     for (x = 0; x < objects.field->width; ++x) {
@@ -166,7 +166,9 @@ void game_new(void)
     field_clear(objects.field);
     objects.smile->state = SMILE_STATE_DEFAULT;
     objects.mine_counter->value = objects.field->mines;
-    objects.time_counter->value = opened_cells = 0;
+    objects.time_counter->value = 0;
+    opened_cells = 0;
+
     state = GAME_STATE_IDLE;
 
     logger_info("New game");
@@ -192,9 +194,8 @@ void game_loop(void)
 {
     window_t window = window_get_instance();
 
-    if (state == GAME_STATE_STARTED) {
-        objects.time_counter->value = time(NULL) - start_time;
-    }
+    if (state == GAME_STATE_STARTED)
+        objects.time_counter->value = (int) (time(NULL) - start_time);
 
     border_render(objects.border, window->projection);
     field_render(objects.field, window->projection);

@@ -1,6 +1,11 @@
+/* 
+ * Copyright (c) 2023 adasdead
+ * This software is licensed under the MIT License.
+ */
+
 #ifndef VERSION_H
 #define VERSION_H
 
-#define PROJECT_VERSION_STRING "[@PROJECT_VERSION_STRING@]"
+#define PROJECT_VERSION_STRING "@PROJECT_VERSION_STRING@"
 
 #endif /* VERSION_H */

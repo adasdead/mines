@@ -1,6 +1,6 @@
 /* 
  * Copyright (c) 2023 adasdead
- * This software is licensed under the MIT License. (see the LICENSE file)
+ * This software is licensed under the MIT License.
  */
 
 #include "window.h"
@@ -77,8 +77,8 @@ void window_initialize(void)
 
     glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
-    window.width *= window.scale;
-    window.height *= window.scale;
+    window.width = (uint) (window.width * window.scale);
+    window.height = (uint) (window.height * window.scale);
 
     window.handle = glfwCreateWindow(window.width, window.height,
                                      WINDOW_NAME, NULL, NULL);
@@ -108,8 +108,8 @@ void window_initialize(void)
 
 void window_resize_with_normalized_sizes(int width, int height)
 {
-    window.width = width * window.scale;
-    window.height = height * window.scale;
+    window.width = (uint) (width * window.scale);
+    window.height = (uint) (height * window.scale);
 
     glViewport(0, 0, window.width, window.height);
 
@@ -117,7 +117,9 @@ void window_resize_with_normalized_sizes(int width, int height)
 
     matrix4x4_free(window.projection);
 
-    window.projection = matrix4x4_ortho(0.0f, width, height,
+    window.projection = matrix4x4_ortho(0.0f,
+                                        (float) width,
+                                        (float) height,
                                         0.0f, -1.0f, 1.0f);
 
     logger_info("Window resized(%dx%d)", window.width, window.height);

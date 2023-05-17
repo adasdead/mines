@@ -1,6 +1,6 @@
 /* 
  * Copyright (c) 2023 adasdead
- * This software is licensed under the MIT License. (see the LICENSE file)
+ * This software is licensed under the MIT License.
  */
 
 #include "resources.h"
@@ -14,8 +14,6 @@ static shader_t shaders[RS_SHADER_TOTAL];
 
 void resources_load(void)
 {
-    int x, y;
-
     texture_atlas = texture_load(ASSETS_DIR"/atlas.png");
 
     shaders[RS_SHADER_FIELD] = shader_load_g(ASSETS_DIR"/field.vs.glsl",

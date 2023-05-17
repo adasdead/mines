@@ -1,6 +1,6 @@
 /* 
  * Copyright (c) 2023 adasdead
- * This software is licensed under the MIT License. (see the LICENSE file)
+ * This software is licensed under the MIT License.
  */
 
 #include "game/border.h"
@@ -27,7 +27,7 @@ enum border_titles {
 
 static void fill_frame(byte *frame, int width, int height)
 {
-    size_t x, y;
+    int x, y;
 
     /* Initialize the frame with the background title */
     memset(frame, BORDER_TT_BACKGROUND, width * height);

@@ -1,6 +1,6 @@
 /* 
  * Copyright (c) 2023 adasdead
- * This software is licensed under the MIT License. (see the LICENSE file)
+ * This software is licensed under the MIT License.
  */
 
 #include "game/smile.h"
@@ -17,7 +17,8 @@
 #include "definitions.h"
 
 /* denormalizes to screen coordinates */
-#define DENORMALIZE(val)    ((val) * window_get_instance()->scale)
+#define DENORMALIZE(val)                                                    \
+    ((float) ((val) * window_get_instance()->scale))
 
 /* WARNING: x and y must not be normalized */
 static bool is_cursor_over_smile(smile_t smile, uint x, uint y)

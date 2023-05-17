@@ -1,6 +1,6 @@
 /* 
  * Copyright (c) 2023 adasdead
- * This software is licensed under the MIT License. (see the LICENSE file)
+ * This software is licensed under the MIT License.
  */
 
 #include "field.h"
@@ -23,7 +23,7 @@ static void shuffle(int *array, size_t size)
 
     if (array == NULL || size <= 1) return;
 
-    srand(time(NULL));
+    srand((unsigned int) time(NULL));
 
     for (i = size - 1; i > 0; i--) {
         j = rand() % (i + 1);
@@ -79,7 +79,7 @@ void field_generate(field_t field, uint x, uint y)
 {
     size_t free_cells = field->width * field->height - 1;
     uint *free_cells_array = NULL;
-    size_t i, j, k;
+    uint i, j, k;
     cell_t cell;
 
     free_cells_array = malloc(free_cells * sizeof(uint));
@@ -114,7 +114,7 @@ void field_generate(field_t field, uint x, uint y)
             cell = field_cell(field, x, y);
 
             if (cell->type != CELL_TYPE_BOMB) {
-                cell->type = field_adjacent_mines(field, x, y);
+                cell->type = (byte) field_adjacent_mines(field, x, y);
             }
         }
     }

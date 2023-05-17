@@ -1,6 +1,6 @@
 /* 
  * Copyright (c) 2023 adasdead
- * This software is licensed under the MIT License. (see the LICENSE file)
+ * This software is licensed under the MIT License.
  */
 
 #ifndef UTIL_LOGGER_H
@@ -38,12 +38,6 @@ logger_log(enum logger_level level, const char *file_name, size_t line_no,
 #define logger_info(format, ...)
 #define logger_warn(format, ...)
 #define logger_fatal(format, ...) exit(-1)
-
-static void
-logger_log(enum logger_level level, const char *file_name, size_t line_no,
-           const char *restrict format, ...)
-{
-}
 #endif /* DEBUG */
 
 #endif /* UTIL_LOGGER_H */

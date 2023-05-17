@@ -1,6 +1,6 @@
 /* 
  * Copyright (c) 2023 adasdead
- * This software is licensed under the MIT License. (see the LICENSE file)
+ * This software is licensed under the MIT License.
  */
 
 #include "graphics/renderer.h"
@@ -55,7 +55,7 @@ void renderer_titles_draw(const struct renderer *renderer,
     glBindBuffer(GL_ARRAY_BUFFER, GL_NONE);
 
     glBindVertexArray(renderer->VAO);
-    glDrawArrays(GL_POINTS, 0, size);
+    glDrawArrays(GL_POINTS, 0, (GLsizei) size);
     glBindVertexArray(GL_NONE);
 }
 

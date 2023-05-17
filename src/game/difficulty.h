@@ -1,6 +1,6 @@
 /* 
  * Copyright (c) 2023 adasdead
- * This software is licensed under the MIT License. (see the LICENSE file)
+ * This software is licensed under the MIT License.
  */
 
 #ifndef GAME_DIFFICULTY
@@ -18,10 +18,10 @@ enum difficulty_id {
 };
 
 struct difficulty {
-    enum difficulty_id   id;
-    uint                 field_width;
-    uint                 field_height;
-    size_t               mines_count;
+    enum difficulty_id      id;
+    uint                    field_width;
+    uint                    field_height;
+    uint                    mines_count;
     
 } static const difficulties[] = {
     { DIFFICULTY_BEGGINER,      9,  9, 10 },

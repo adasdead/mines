@@ -1,6 +1,6 @@
 /* 
  * Copyright (c) 2023 adasdead
- * This software is licensed under the MIT License. (see the LICENSE file)
+ * This software is licensed under the MIT License.
  */
 
 #include "matrix4x4.h"
@@ -21,7 +21,7 @@ mat4 matrix4x4_allocate(void)
 
 mat4 matrix4x4_identity(mat4 mat)
 {
-    size_t i;
+    uint i;
 
     if (mat != NULL) {
         memset(mat, 0, MATRIX4X4_SIZE * sizeof *mat);
@@ -36,7 +36,7 @@ mat4 matrix4x4_identity(mat4 mat)
 
 mat4 matrix4x4_mult(mat4 restrict dest, const mat4 src)
 {
-    size_t i, j, k;
+    uint i, j, k;
     mat4 result = matrix4x4_allocate();
     float x, y, z;
 

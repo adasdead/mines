@@ -1,6 +1,6 @@
 /* 
  * Copyright (c) 2023 adasdead
- * This software is licensed under the MIT License. (see the LICENSE file)
+ * This software is licensed under the MIT License.
  */
 
 #ifndef GAME_FIELD_H
@@ -40,8 +40,8 @@ static inline void field_shift_pos(int *x, int *y)
 static inline bool field_is_within(const field_t field,
                                    int x, int y)
 {
-    return (x >= 0) && (x < field->width) &&
-           (y >= 0) && (y < field->height);
+    return (x >= 0) && (x < (int) field->width) &&
+           (y >= 0) && (y < (int) field->height);
 }
 
 field_t field_create(uint width, uint height, uint mines);

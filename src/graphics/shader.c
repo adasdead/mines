@@ -1,6 +1,6 @@
 /* 
  * Copyright (c) 2023 adasdead
- * This software is licensed under the MIT License. (see the LICENSE file)
+ * This software is licensed under the MIT License.
  */
 
 #include "graphics/shader.h"
@@ -10,6 +10,10 @@
 #include <errno.h>
 
 #include "util/logger.h"
+
+#if _MSC_VER
+#pragma warning(disable : 4996)
+#endif
 
 static char *read_file_to_string(const char *file_path)
 {
