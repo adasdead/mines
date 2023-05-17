@@ -6,7 +6,6 @@
 #include "game/counter.h"
 
 #include <string.h>
-#include <math.h>
 
 #include "util/resources.h"
 #include "util/logger.h"

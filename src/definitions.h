@@ -12,7 +12,7 @@
  * Project definitions
  ***************************************************************************/
 
-#define WINDOW_NAME             "Minesweeper ["PROJECT_VERSION_STRING"]"
+#define WINDOW_NAME             "Minesweeper ["PROJECT_VERSION"]"
 #define WINDOW_SCALE            33.75f
 
 #define ASSETS_DIR              "assets"

@@ -7,36 +7,30 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_executable(${PROJECT_NAME} main.c util/logger.c)
     target_compile_definitions(${PROJECT_NAME} PRIVATE DEBUG=1)
 else()
-    add_executable(${PROJECT_NAME} WIN32 main.c)
+    add_executable(${PROJECT_NAME} WIN32 main.c mines.rc)
     target_compile_definitions(${PROJECT_NAME} PRIVATE DEBUG=0)
 endif()
-
-# MAJOR.MINOR
-string(CONCAT PROJECT_VERSION_STRING
-    ${PROJECT_VERSION_MAJOR} "." ${PROJECT_VERSION_MINOR}
-)
 
 configure_file(version.h.in version.h @ONLY)
 
 target_sources(${PROJECT_NAME} PRIVATE
-    graphics/shader.c
-    graphics/texture.c
-    graphics/renderer.c
-
-    util/resources.c
-    util/matrix4x4.c
-
     game/game.c
     game/window.c
     game/field.c
     game/smile.c
     game/counter.c
     game/border.c
+
+    graphics/shader.c
+    graphics/texture.c
+    graphics/renderer.c
+
+    util/resources.c
+    util/matrix4x4.c
 )
 
 target_link_libraries(${PROJECT_NAME}
     ${CMAKE_DL_LIBS}
-    ${MATH_LIB}
     OpenGL::GL
     glfw
     glad

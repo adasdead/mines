@@ -93,5 +93,6 @@ _deps
 
 ### VisualStudioCode CMake ###
 build/
+bin/
 
 # End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,cmake,c
