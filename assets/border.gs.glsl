@@ -9,7 +9,7 @@ in VS_OUT {
 out vec2 tex_coord;
 
 const float ATLAS_SIZE = 256.0;
-const float TILE_SIZE = 8.0;
+const float TILE_SIZE = 16.0;
 
 layout (points) in;
 layout (triangle_strip, max_vertices = 4) out;
