@@ -6,7 +6,7 @@
 #include "game/game.h"
 
 #include <time.h>
-#include <stdio.h>
+#include <string.h>
 
 #include "game/window.h"
 #include "game/field.h"
@@ -49,10 +49,9 @@ static inline bool game_is_over(void)
 static void update_game_activity(void)
 {
 #if DISCORD
-    char difficulty[128] = {0};
-
-    snprintf(difficulty, 127, "Difficulty: %s",
-             difficulty_name(DIFFICULTY(current_difficulty)));
+    const char *difficulty;
+    
+    difficulty = difficulty_name(DIFFICULTY(current_difficulty));
 
     switch (state)
     {
@@ -65,11 +64,11 @@ static void update_game_activity(void)
             break;
 
         case GAME_STATE_WON:
-            discord_update_activity("Won", difficulty, 0);
+            discord_update_activity("Won the game", difficulty, 0);
             break;
 
         case GAME_STATE_LOSE:
-            discord_update_activity("Lose", difficulty, 0);
+            discord_update_activity("Lost the game", difficulty, 0);
             break;
     }
 #endif /* DISCORD */
