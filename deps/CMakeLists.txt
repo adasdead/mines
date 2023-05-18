@@ -21,35 +21,21 @@ add_library(glad STATIC glad/glad.c)
 # Discord SDK                                                               #
 #############################################################################
 
-if(EXISTS "${PROJECT_DEPS_DIR}/discord_sdk")
+if(EXISTS "${PROJECT_DEPS_DIR}/discord_sdk" AND WIN32)
     message(STATUS "Discord SDK found!")
 
     set(DISCORD_SDK_FOUND ON PARENT_SCOPE)
     set(DISCORD_SDK_DIR "${PROJECT_DEPS_DIR}/discord_sdk")
     set(DISCORD_SDK_INCLUDE_DIR "${DISCORD_SDK_DIR}/c" CACHE INTERNAL "")
 
-    if(WIN32)
-        set(DISCORD_SDK_LIBRARY
-            "${DISCORD_SDK_DIR}/lib/x86_64/discord_game_sdk.dll.lib"
-            CACHE INTERNAL ""
-        )
-        set(DISCORD_SDK_DLL
-            "${DISCORD_SDK_DIR}/lib/x86_64/discord_game_sdk.dll"
-            CACHE INTERNAL ""
-        )
-    elseif(UNIX)
-        set(DISCORD_SDK_LIBRARY
-            "${DISCORD_SDK_DIR}/lib/x86_64/discord_game_sdk.so"
-            CACHE INTERNAL ""
-        )
-        set(DISCORD_SDK_DLL DISCORD_SDK_LIBRARY CACHE INTERNAL "")
-    elseif(APPLE)
-        set(DISCORD_SDK_LIBRARY
-            "${DISCORD_SDK_DIR}/lib/x86_64/discord_game_sdk.dylib"
-            CACHE INTERNAL ""
-        )
-        set(DISCORD_SDK_DLL DISCORD_SDK_LIBRARY CACHE INTERNAL "")
-    endif()
+    set(DISCORD_SDK_LIBRARY
+        "${DISCORD_SDK_DIR}/lib/x86_64/discord_game_sdk.dll.lib"
+        CACHE INTERNAL ""
+    )
+    set(DISCORD_SDK_DLL
+        "${DISCORD_SDK_DIR}/lib/x86_64/discord_game_sdk.dll"
+        CACHE INTERNAL ""
+    )
 endif()
 
 #############################################################################
@@ -57,4 +43,3 @@ endif()
 #############################################################################
 
 include_directories(".")
-

@@ -46,6 +46,10 @@ if __name__ == '__main__':
         print("Only x64 architecture is supported for SDK")
         exit()
 
+    if os.name != 'nt':
+        print("Currently only supported on Windows")
+        exit()
+
     download_sdk_zip()
     unpack_sdk_zip()
     delete_sdk_zip()
