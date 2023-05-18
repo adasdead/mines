@@ -6,6 +6,7 @@
 #include "game/game.h"
 
 #include <time.h>
+#include <stdio.h>
 
 #include "game/window.h"
 #include "game/field.h"
@@ -14,13 +15,14 @@
 #include "game/counter.h"
 #include "game/border.h"
 
+#include "util/discord.h"
 #include "util/logger.h"
 
 #include "definitions.h"
 
 enum game_state {
     GAME_STATE_IDLE,
-    GAME_STATE_STARTED,
+    GAME_STATE_PLAYS,
     GAME_STATE_LOSE,
     GAME_STATE_WON
 };
@@ -42,6 +44,35 @@ static enum game_state state = GAME_STATE_IDLE;
 static inline bool game_is_over(void)
 {
     return (state == GAME_STATE_LOSE) || (state == GAME_STATE_WON);
+}
+
+static void update_game_activity(void)
+{
+#if DISCORD
+    char difficulty[128] = {0};
+
+    snprintf(difficulty, 127, "Difficulty: %s",
+             difficulty_name(DIFFICULTY(current_difficulty)));
+
+    switch (state)
+    {
+        case GAME_STATE_PLAYS:
+            discord_update_activity("Plays", difficulty, time(NULL));
+            break;
+        
+        case GAME_STATE_IDLE:
+            discord_update_activity("Idle", NULL, 0);
+            break;
+
+        case GAME_STATE_WON:
+            discord_update_activity("Won", difficulty, 0);
+            break;
+
+        case GAME_STATE_LOSE:
+            discord_update_activity("Lose", difficulty, 0);
+            break;
+    }
+#endif /* DISCORD */
 }
 
 static void game_lose(void)
@@ -73,6 +104,8 @@ static void game_lose(void)
     
     state = GAME_STATE_LOSE;
 
+    update_game_activity();
+
     logger_info("Lose");
 }
 
@@ -95,7 +128,20 @@ static void game_won(void)
     objects.mine_counter->value = 0;
     state = GAME_STATE_WON;
 
+    update_game_activity();
+
     logger_info("Won");
+}
+
+static void game_start(uint safe_x, uint safe_y)
+{
+    field_generate(objects.field, safe_x, safe_y);
+    start_time = time(NULL);
+    state = GAME_STATE_PLAYS;
+
+    update_game_activity();
+
+    logger_info("Start");
 }
 
 static void open_cell(int x, int y)
@@ -171,6 +217,8 @@ void game_new(void)
 
     state = GAME_STATE_IDLE;
 
+    update_game_activity();
+
     logger_info("New game");
 }
 
@@ -194,7 +242,7 @@ void game_loop(void)
 {
     window_t window = window_get_instance();
 
-    if (state == GAME_STATE_STARTED)
+    if (state == GAME_STATE_PLAYS)
         objects.time_counter->value = (int) (time(NULL) - start_time);
 
     border_render(objects.border, window->projection);
@@ -214,11 +262,8 @@ void game_on_left_click(int x, int y, bool press)
     if (!field_is_within(objects.field, x, y)) return;
 
     if (press && state != GAME_STATE_LOSE) {
-        if (state == GAME_STATE_IDLE) {
-            field_generate(objects.field, x, y);
-            start_time = time(NULL);
-            state = GAME_STATE_STARTED;
-        }
+        if (state == GAME_STATE_IDLE)
+            game_start(x, y);
 
         open_cell(x, y);
     }
@@ -262,8 +307,7 @@ void game_toggle_difficulty(void)
     current_difficulty = difficulty->id;
 
 #if DEBUG
-    logger_info("Difficulty changed to %s",
-                difficulty_name(difficulty));
+    logger_info("Difficulty changed to %s", difficulty_name(difficulty));
 #endif /* DEBUG */
     
     update_objects();

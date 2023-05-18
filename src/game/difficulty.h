@@ -31,21 +31,15 @@ struct difficulty {
 
 typedef const struct difficulty *difficulty_t;
 
-#if DEBUG
-static const char *difficulty_name(const difficulty_t dif)
+static const char *difficulty_name(const difficulty_t difficulty)
 {
-    switch (dif->id)
+    switch (difficulty->id)
     {
-        case DIFFICULTY_BEGGINER:
-            return "BEGGINER";
-        case DIFFICULTY_INTERMEDIATE:
-            return "INTERMEDIATE";
-        case DIFFICULTY_EXPERT:
-            return "EXPERT";
+        case DIFFICULTY_BEGGINER: return "BEGGINER";
+        case DIFFICULTY_INTERMEDIATE: return "INTERMEDIATE";
+        case DIFFICULTY_EXPERT: return "EXPERT";
+        default: return "UNKNOWN";
     }
-
-    return "UNKNOWN";
 }
-#endif
 
 #endif /* GAME_DIFFICULTY */

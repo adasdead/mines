@@ -37,6 +37,8 @@
         "utility": "c",
         "string.h": "c",
         "rendering.h": "c",
-        "math.h": "c"
+        "math.h": "c",
+        "discord_game_sdk.h": "c",
+        "time.h": "c"
     }
 }

@@ -10,6 +10,7 @@
 
 #include "util/logger.h"
 #include "util/resources.h"
+#include "util/discord.h"
 
 static void on_glfw_error_callback(int code, const char *message)
 {
@@ -24,6 +25,7 @@ int main(void)
     glfwSetErrorCallback(on_glfw_error_callback);
 
     window_initialize();
+    discord_initialize();
 
     if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {
         window_free();
@@ -42,12 +44,14 @@ int main(void)
 
         game_loop();
 
+        discord_run_callbacks();
         glfwSwapBuffers(window_get_instance()->handle);
         glfwPollEvents();
     }
 
     game_free();
     resources_free();
+    discord_free();
     window_free();
 
     glfwTerminate();

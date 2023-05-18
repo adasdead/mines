@@ -11,6 +11,17 @@ else()
     target_compile_definitions(${PROJECT_NAME} PRIVATE DEBUG=0)
 endif()
 
+if (DISCORD_SDK_FOUND)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE DISCORD=1)
+    target_sources(${PROJECT_NAME} PRIVATE util/discord.c)
+    target_link_libraries(${PROJECT_NAME} ${DISCORD_SDK_LIBRARY})
+    add_custom_command(TARGET ${PROJECT_NAME}
+        COMMAND ${CMAKE_COMMAND} -E copy
+        ${DISCORD_SDK_DLL}
+        $<TARGET_FILE_DIR:${PROJECT_NAME}>
+    )
+endif()
+
 configure_file(version.h.in version.h @ONLY)
 
 target_sources(${PROJECT_NAME} PRIVATE
@@ -40,10 +51,11 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     ${PROJECT_SOURCE_DIR}
     ${PROJECT_DEPS_DIR}
     ${CMAKE_CURRENT_BINARY_DIR}
+    ${DISCORD_SDK_INCLUDE_DIR}
 )
 
 add_custom_command(TARGET ${PROJECT_NAME}
     COMMAND ${CMAKE_COMMAND} -E copy_directory
-    ${PROJECT_ASSETS_DIR}                       # src
-    $<TARGET_FILE_DIR:${PROJECT_NAME}>/assets   # dest
+    ${PROJECT_ASSETS_DIR}
+    $<TARGET_FILE_DIR:${PROJECT_NAME}>/assets
 )
