@@ -90,12 +90,9 @@ static void game_lose(void)
                 if (cell->type != CELL_TYPE_BOMB) {
                     cell->state = CELL_STATE_OPENED;
                     cell->type = CELL_TYPE_NO_BOMB;
-                    continue;
                 }
 
-                if (cell->type == CELL_TYPE_BOMB) {
-                    continue;
-                }
+                continue;
             }
 
             cell->state = CELL_STATE_OPENED;
@@ -306,9 +303,7 @@ void game_toggle_difficulty(void)
     difficulty_t difficulty = DIFFICULTY((current + 1));
     current_difficulty = difficulty->id;
 
-#if DEBUG
     logger_info("Difficulty changed to %s", difficulty_name(difficulty));
-#endif /* DEBUG */
     
     update_objects();
     game_new();

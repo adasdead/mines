@@ -15,7 +15,7 @@ enum logger_level {
     LOGGER_INFO, LOGGER_WARN, LOGGER_FATAL,
 };
 
-#if DEBUG
+#if LOGGER
 
 #define logger_info(format, ...)                                            \
     logger_log(LOGGER_INFO, __FILE__, __LINE__, format, ##__VA_ARGS__)
@@ -38,6 +38,6 @@ logger_log(enum logger_level level, const char *file_name, size_t line_no,
 #define logger_info(format, ...)
 #define logger_warn(format, ...)
 #define logger_fatal(format, ...) exit(-1)
-#endif /* DEBUG */
+#endif /* LOGGER */
 
 #endif /* UTIL_LOGGER_H */
