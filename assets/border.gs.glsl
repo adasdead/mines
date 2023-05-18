@@ -16,8 +16,8 @@ layout (triangle_strip, max_vertices = 4) out;
 
 void main() {
     float offset = TILE_SIZE / ATLAS_SIZE;
-    float x = (gs_in[0].tile % 32) * offset;
-    float y = (gs_in[0].tile / 32) * offset;
+    float x = (gs_in[0].tile % 32u) * offset;
+    float y = (gs_in[0].tile / 32u) * offset;
     y += 65 / ATLAS_SIZE;
 
     vec4 pos = gl_in[0].gl_Position;
