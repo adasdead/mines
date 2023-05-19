@@ -9,13 +9,13 @@
 #include <string.h>
 #include <stdarg.h>
 
-#define ANSI_RESET                              "\033[0m"
-#define ANSI_RED_BACKGROUND                     "\033[0;101m"
-#define ANSI_YLW_BACKGROUND                     "\033[0;103m"
-#define ANSI_GRN_BACKGROUND                     "\033[0;102m"
-#define PATH_SEPARATOR                          '/'
+#define ANSI_RESET                      "\033[0m"
+#define ANSI_RED_BACKGROUND             "\033[0;101m"
+#define ANSI_YELLOW_BACKGROUND          "\033[0;103m"
+#define ANSI_GREEN_BACKGROUND           "\033[0;102m"
+#define PATH_SEPARATOR                  '/'
 
-#define FORMAT                                  "[%s:%zu] %s%s"ANSI_RESET" "
+#define FORMAT                          "[%s:%zu] %s%s"ANSI_RESET" "
 
 static void
 get_color_and_status(enum logger_level level, const char **color,
@@ -23,7 +23,7 @@ get_color_and_status(enum logger_level level, const char **color,
 {
     switch (level) {
         case LOGGER_WARN:
-            *color = ANSI_YLW_BACKGROUND;
+            *color = ANSI_YELLOW_BACKGROUND;
             *status = "WARN";
             break;
             
@@ -34,14 +34,13 @@ get_color_and_status(enum logger_level level, const char **color,
 
         default:
         case LOGGER_INFO:
-            *color = ANSI_GRN_BACKGROUND;
+            *color = ANSI_GREEN_BACKGROUND;
             *status = "INFO";
     }
 }
 
-void
-logger_log(enum logger_level level, const char *file_name, size_t line_no,
-           const char *restrict format, ...)
+void logger_log(enum logger_level level, const char *file_name,
+                size_t line_no, const char *restrict format, ...)
 {
     const char *background_color, *status;
     FILE *output_stream = stdout;

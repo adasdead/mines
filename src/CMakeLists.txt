@@ -3,11 +3,8 @@
 
 find_package(OpenGL REQUIRED)
 
-option(MINES_LOGGER "Leave logger in release build" OFF)
-
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_executable(${PROJECT_NAME} main.c)
-    set(MINES_LOGGER ON)
 else()
     add_executable(${PROJECT_NAME} WIN32 main.c mines.rc)
 endif()
@@ -21,11 +18,6 @@ if (DISCORD_SDK_FOUND)
         ${DISCORD_SDK_DLL}
         $<TARGET_FILE_DIR:${PROJECT_NAME}>
     )
-endif()
-
-if(MINES_LOGGER)
-    target_sources(${PROJECT_NAME} PRIVATE util/logger.c)
-    target_compile_definitions(${PROJECT_NAME} PRIVATE LOGGER=1)
 endif()
 
 configure_file(version.h.in version.h @ONLY)
@@ -44,6 +36,7 @@ target_sources(${PROJECT_NAME} PRIVATE
 
     util/resources.c
     util/matrix4x4.c
+    util/logger.c
 )
 
 target_link_libraries(${PROJECT_NAME}
