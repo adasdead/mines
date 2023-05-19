@@ -155,7 +155,7 @@ void field_render(field_t field, mat4 projection)
     shader_set_uniform_m4fv(shader, "u_projection", projection);
     shader_set_uniform_2i(shader, "u_field_size", field->width,
                                                   field->height);
-    shader_set_uniform_2i(shader, "u_field_pos", FIELD_LX, FIELD_LY);
+    shader_set_uniform_2i(shader, "u_field_pos", FIELD_LEFT_X, FIELD_LEFT_Y);
     shader_set_uniform_2i(shader, "u_mouse_pos", cursor_x, cursor_y);
 
     texture_bind(resources_texture_atlas());

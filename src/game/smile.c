@@ -24,7 +24,7 @@
 static bool is_cursor_over_smile(smile_t smile, uint x, uint y)
 {
     float left = DENORMALIZE(smile->x + SMILE_OFFSET);
-    float top = DENORMALIZE(SMILE_LY + SMILE_OFFSET);
+    float top = DENORMALIZE(SMILE_LEFT_Y + SMILE_OFFSET);
     float scale = DENORMALIZE(SMILE_SCALE);
 
     return !(y <= top || y >= top + scale || x <= left ||
@@ -48,11 +48,13 @@ smile_t smile_create(void (*click_callback)(void))
 
 void smile_update_model_matrix(smile_t smile)
 {
-    float x = smile->x + SMILE_OFFSET;
+    float x;
 
-    static const float y = SMILE_LY + SMILE_OFFSET;
+    static const float y = SMILE_LEFT_Y + SMILE_OFFSET;
 
     if (smile != NULL) {
+        x = smile->x + SMILE_OFFSET;
+        
         matrix4x4_identity(smile->model);
         matrix4x4_scale(smile->model, SMILE_SCALE, SMILE_SCALE);
         matrix4x4_translate(smile->model, x, y);

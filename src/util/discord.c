@@ -67,7 +67,7 @@ void discord_update_activity(const char *details, const char *state,
         snprintf(activity.state, BUF_SIZE, "%s", state);
 
     if (details != NULL)
-        snprintf(activity.state, BUF_SIZE, "%s", details);
+        snprintf(activity.details, BUF_SIZE, "%s", details);
 
     if (core != NULL) {
         manager->update_activity(manager, &activity, NULL,

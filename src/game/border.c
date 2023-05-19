@@ -35,7 +35,7 @@ static void fill_frame(byte *frame, int width, int height)
     /* Horizontal lines */
     for (x = 0; x < width; ++x) {
         frame[x] = BORDER_TT_HORIZONTAL;
-        frame[width * BORDER_SEP_LY + x] = BORDER_TT_HORIZONTAL;
+        frame[width * BORDER_SEP_LEFT_Y + x] = BORDER_TT_HORIZONTAL;
         frame[width * (height - 1) + x] = BORDER_TT_HORIZONTAL;
     }
 
@@ -52,8 +52,8 @@ static void fill_frame(byte *frame, int width, int height)
     frame[width * height - 1] = BORDER_TT_CORBER_SE;
 
     /* Separators */
-    frame[width * BORDER_SEP_LY] = BORDER_TT_SEP_RIGHT;
-    frame[width * BORDER_SEP_LY + (width - 1)] = BORDER_TT_SEP_LEFT;
+    frame[width * BORDER_SEP_LEFT_Y] = BORDER_TT_SEP_RIGHT;
+    frame[width * BORDER_SEP_LEFT_Y + (width - 1)] = BORDER_TT_SEP_LEFT;
 }
 
 border_t border_create(void)

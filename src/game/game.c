@@ -53,8 +53,7 @@ static void update_game_activity(void)
     
     difficulty = difficulty_name(DIFFICULTY(current_difficulty_id));
 
-    switch (state)
-    {
+    switch (state) {
         case GAME_STATE_PLAYS:
             discord_update_activity("Plays", difficulty, time(NULL));
             break;
@@ -175,12 +174,12 @@ static void update_objects(void)
                                  difficulty->field_height,
                                  difficulty->mines_count);
     
-    width = FIELD_LX + objects.field->width + FIELD_RX;
-    height = FIELD_LY + objects.field->height + FIELD_RY;
+    width = FIELD_LEFT_X + objects.field->width + FIELD_RIGHT_X;
+    height = FIELD_LEFT_Y + objects.field->height + FIELD_RIGHT_Y;
 
     window_resize_with_normalized_sizes(width, height);
 
-    objects.time_counter->x = width - x_offset - FIELD_RX;
+    objects.time_counter->x = width - x_offset - FIELD_RIGHT_X;
     counter_update_model_matrices(objects.time_counter);
 
     objects.smile->x = (width / 2.0f) - 1.0f;
@@ -217,7 +216,7 @@ void game_initialize(void)
     objects.smile = smile_create(game_reset);
 
     objects.mine_counter = counter_create();
-    objects.mine_counter->x = FIELD_LX + COUNTER_OFFSET_LRX;
+    objects.mine_counter->x = FIELD_LEFT_X + COUNTER_OFFSET_LRX;
     counter_update_model_matrices(objects.mine_counter);
 
     objects.time_counter = counter_create();

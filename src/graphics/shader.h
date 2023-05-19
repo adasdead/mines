@@ -20,7 +20,6 @@ void shader_use(shader_t shader);
 void shader_set_uniform_1i(shader_t shader, const char *name, int value);
 void shader_set_uniform_m4fv(shader_t shader, const char *name, mat4 matrix);
 void shader_set_uniform_2i(shader_t shader, const char *name, int x, int y);
-void shader_set_uniform_2f(shader_t shader, const char *name, float x, float y);
 void shader_free(shader_t shader);
 
 #endif /* GRAPHICS_SHADER_H */

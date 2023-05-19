@@ -33,8 +33,7 @@ typedef const struct difficulty *difficulty_t;
 
 static const char *difficulty_name(difficulty_t difficulty)
 {
-    switch (difficulty->id)
-    {
+    switch (difficulty->id) {
         case DIFFICULTY_BEGGINER:       return "BEGGINER";
         case DIFFICULTY_INTERMEDIATE:   return "INTERMEDIATE";
         case DIFFICULTY_EXPERT:         return "EXPERT";

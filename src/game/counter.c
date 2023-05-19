@@ -70,7 +70,7 @@ void counter_update_model_matrices(counter_t counter)
     size_t i;
     mat4 *cur = counter->models;
     
-    static const float y = COUNTER_LY + COUNTER_OFFSET_LY;
+    static const float y = COUNTER_LEFT_Y + COUNTER_OFFSET_LY;
 
     for (i = 0; i < COUNTER_DIGITS; ++i, ++cur) {
         matrix4x4_identity(*cur);

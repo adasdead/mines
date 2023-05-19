@@ -17,23 +17,23 @@
 
 #define ASSETS_DIR                      "assets"
 
-#define FIELD_LX                        1
-#define FIELD_LY                        4
-#define FIELD_RX                        FIELD_LX
-#define FIELD_RY                        FIELD_LX
+#define FIELD_LEFT_X                    1
+#define FIELD_LEFT_Y                    4
+#define FIELD_RIGHT_X                   FIELD_LEFT_X
+#define FIELD_RIGHT_Y                   FIELD_LEFT_X
 
-#define SMILE_LY                        1
+#define SMILE_LEFT_Y                    1
 #define SMILE_OFFSET                    0.15f
 #define SMILE_SCALE                     1.655f
 
-#define COUNTER_LY                      1
+#define COUNTER_LEFT_Y                  1
 #define COUNTER_DIGITS                  3
 #define COUNTER_OFFSET_LRX              0.5f
 #define COUNTER_OFFSET_LY               0.25f
 #define COUNTER_WIDTH                   0.82f
 #define COUNTER_HEIGHT                  1.465f
 
-#define BORDER_SEP_LY                   3
+#define BORDER_SEP_LEFT_Y               3
 
 /****************************************************************************
  * Discord

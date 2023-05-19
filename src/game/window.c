@@ -76,9 +76,12 @@ void window_initialize(void)
 
     glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
-    window.width = FIELD_LX + difficulties->field_width + FIELD_RX;
-    window.height = FIELD_LY + difficulties->field_height + FIELD_RY;
+    window.width = FIELD_LEFT_X + FIELD_RIGHT_X;
+    window.width += difficulties->field_width;
     window.width = (uint) (window.width * window.scale);
+    
+    window.height = FIELD_LEFT_Y + FIELD_RIGHT_Y;
+    window.height += difficulties->field_height;
     window.height = (uint) (window.height * window.scale);
 
     window.handle = glfwCreateWindow(window.width, window.height,

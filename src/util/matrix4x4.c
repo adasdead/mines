@@ -38,17 +38,16 @@ mat4 matrix4x4_mult(mat4 restrict dest, const mat4 src)
 {
     uint i, j, k;
     mat4 result = matrix4x4_allocate();
-    float x, y, z;
+    float sum;
 
     if (dest != NULL && src != NULL) {
         for (i = 0; i < MATRIX4X4_WIDTH; ++i) {
             for (j = 0; j < MATRIX4X4_WIDTH; ++j) {
                 for (k = 0; k < MATRIX4X4_WIDTH; ++k) {
-                    x = matrix4x4_get(dest, i, k);
-                    y = matrix4x4_get(src, k, j);
-                    z = matrix4x4_get(result, i, j);
-
-                    matrix4x4_set(result, i, j, z + (x * y));
+                    sum = matrix4x4_get(dest, i, k);
+                    sum *= matrix4x4_get(src, k, j);
+                    sum += matrix4x4_get(result, i, j);
+                    matrix4x4_set(result, i, j, sum);
                 }
             }
         }

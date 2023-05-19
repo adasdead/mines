@@ -33,8 +33,8 @@ typedef struct field *field_t;
 
 static inline void field_shift_pos(int *x, int *y)
 {
-    *x -= FIELD_LX;
-    *y -= FIELD_LY;
+    *x -= FIELD_LEFT_X;
+    *y -= FIELD_LEFT_Y;
 }
 
 static inline bool field_is_within(const field_t field,
