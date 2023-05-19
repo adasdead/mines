@@ -5,11 +5,15 @@
 
 #include "discord.h"
 
+#include <stdio.h>
+
 #include <discord_game_sdk.h>
 
 #include "util/logger.h"
 
 #include "definitions.h"
+
+#define BUF_SIZE                        128
 
 #if _MSC_VER
 #pragma warning(disable : 4996)
@@ -51,21 +55,19 @@ void discord_update_activity(const char *details, const char *state,
 {
     struct DiscordActivity activity = {0};
 
-    strncpy(activity.name, DISCORD_ACTIVITY_NAME, 128);
-    strncpy(activity.assets.large_image, "icon", 128);
-    strncpy(activity.assets.large_text, "icon", 128);
+    snprintf(activity.name, BUF_SIZE, "%s", DISCORD_ACTIVITY_NAME);
+    snprintf(activity.assets.large_image, BUF_SIZE, "%s", "icon");
+    snprintf(activity.assets.large_text, BUF_SIZE, "%s", "icon");
 
     activity.application_id = DISCORD_CLIENT_ID;
     activity.type = DiscordActivityType_Playing;
     activity.timestamps.start = (DiscordTimestamp) start_time;
 
-    if (state != NULL) {
-        strncpy(activity.state, state, strnlen(state, 128));
-    }
+    if (state != NULL)
+        snprintf(activity.state, BUF_SIZE, "%s", state);
 
-    if (details != NULL) {
-        strncpy(activity.details, details, strnlen(details, 128));
-    }
+    if (details != NULL)
+        snprintf(activity.state, BUF_SIZE, "%s", details);
 
     if (core != NULL) {
         manager->update_activity(manager, &activity, NULL,

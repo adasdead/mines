@@ -37,7 +37,7 @@ key_callback(GLFWwindow *win, int key, int code, int act, int mods)
             break;
 
         case GLFW_KEY_N:
-            game_new();
+            game_reset();
             break;
     }
 }
@@ -49,18 +49,20 @@ mouse_button_callback(GLFWwindow *win, int btn, int act, int mods)
 
     switch (btn) {
         case GLFW_MOUSE_BUTTON_RIGHT:
-            game_on_right_click(window.cursor.x, window.cursor.y, pressed);
+            game_on_right_click(window.cursor.x, window.cursor.y,
+                                pressed);
             break;
         
         case GLFW_MOUSE_BUTTON_LEFT:
-            game_on_left_click(window.cursor.x, window.cursor.y, pressed);
+            game_on_left_click(window.cursor.x, window.cursor.y,
+                               pressed);
             break;
     }
 }
 
 void window_initialize(void)
 {
-    GLFWimage image;
+    GLFWimage icon_image;
     const GLFWvidmode *video_mode;
 
     if (window.initialized) {
@@ -68,15 +70,14 @@ void window_initialize(void)
         return;
     }
 
-    window.width = FIELD_LX + difficulties->field_width + FIELD_RX;
-    window.height = FIELD_LY + difficulties->field_height + FIELD_RY;
-
     video_mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
     window.scale = (video_mode->height) * 1.f / WINDOW_SCALE;
     logger_info("Scale factor: %f", window.scale);
 
     glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
+    window.width = FIELD_LX + difficulties->field_width + FIELD_RX;
+    window.height = FIELD_LY + difficulties->field_height + FIELD_RY;
     window.width = (uint) (window.width * window.scale);
     window.height = (uint) (window.height * window.scale);
 
@@ -92,12 +93,14 @@ void window_initialize(void)
     glfwSetCursorPosCallback(window.handle, cursor_pos_callback);
     glfwSetMouseButtonCallback(window.handle, mouse_button_callback);
 
-    image.pixels = stbi_load(ASSETS_DIR"/icon.png", &image.width,
-                             &image.height, NULL, STBI_rgb_alpha);
+    icon_image.pixels = stbi_load(ASSETS_DIR"/icon.png",
+                                  &icon_image.width,
+                                  &icon_image.height,
+                                  NULL, STBI_rgb_alpha);
 
-    glfwSetWindowIcon(window.handle, 1, &image);
+    glfwSetWindowIcon(window.handle, 1, &icon_image);
 
-    stbi_image_free(image.pixels);
+    stbi_image_free(icon_image.pixels);
 
     glfwMakeContextCurrent(window.handle);
 

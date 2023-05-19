@@ -10,8 +10,9 @@
 
 #include "util/basic_types.h"
 
-#define MATRIX4X4_WIDTH     4
-#define MATRIX4X4_SIZE      MATRIX4X4_WIDTH * MATRIX4X4_WIDTH
+#define MATRIX4X4_WIDTH                 4
+/* MATRIX4X4_WIDTH * MATRIX4X4_WIDTH */
+#define MATRIX4X4_SIZE                  16
 
 typedef float *mat4;
 

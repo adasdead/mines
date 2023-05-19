@@ -37,7 +37,7 @@ static struct {
 
 static time_t start_time = 0;
 static size_t opened_cells = 0;
-static uint current_difficulty = 0;
+static uint current_difficulty_id = 0;
 
 static enum game_state state = GAME_STATE_IDLE;
 
@@ -51,7 +51,7 @@ static void update_game_activity(void)
 #if DISCORD
     const char *difficulty;
     
-    difficulty = difficulty_name(DIFFICULTY(current_difficulty));
+    difficulty = difficulty_name(DIFFICULTY(current_difficulty_id));
 
     switch (state)
     {
@@ -99,9 +99,7 @@ static void game_lose(void)
     }
     
     state = GAME_STATE_LOSE;
-
     update_game_activity();
-
     logger_info("Lose");
 }
 
@@ -122,22 +120,10 @@ static void game_won(void)
 
     objects.smile->state = SMILE_STATE_COOL;
     objects.mine_counter->value = 0;
+
     state = GAME_STATE_WON;
-
     update_game_activity();
-
     logger_info("Won");
-}
-
-static void game_start(uint safe_x, uint safe_y)
-{
-    field_generate(objects.field, safe_x, safe_y);
-    start_time = time(NULL);
-    state = GAME_STATE_PLAYS;
-
-    update_game_activity();
-
-    logger_info("Start");
 }
 
 static void open_cell(int x, int y)
@@ -177,7 +163,7 @@ static void open_cell(int x, int y)
 
 static void update_objects(void)
 {
-    difficulty_t difficulty = DIFFICULTY(current_difficulty);
+    difficulty_t difficulty = DIFFICULTY(current_difficulty_id);
     uint width, height;
 
     static const float x_offset = COUNTER_DIGITS * COUNTER_WIDTH +
@@ -203,7 +189,17 @@ static void update_objects(void)
     border_update(objects.border, width, height);
 }
 
-void game_new(void)
+static void game_start(uint safe_x, uint safe_y)
+{
+    field_generate(objects.field, safe_x, safe_y);
+    start_time = time(NULL);
+
+    state = GAME_STATE_PLAYS;
+    update_game_activity();
+    logger_info("Start");
+}
+
+void game_reset(void)
 {
     field_clear(objects.field);
     objects.smile->state = SMILE_STATE_DEFAULT;
@@ -212,15 +208,13 @@ void game_new(void)
     opened_cells = 0;
 
     state = GAME_STATE_IDLE;
-
     update_game_activity();
-
-    logger_info("New game");
+    logger_info("Reset");
 }
 
 void game_initialize(void)
 {
-    objects.smile = smile_create(game_new);
+    objects.smile = smile_create(game_reset);
 
     objects.mine_counter = counter_create();
     objects.mine_counter->x = FIELD_LX + COUNTER_OFFSET_LRX;
@@ -231,7 +225,7 @@ void game_initialize(void)
     objects.border = border_create();
 
     update_objects();
-    game_new();
+    game_reset();
 }
 
 void game_loop(void)
@@ -298,14 +292,15 @@ void game_on_right_click(int x, int y, bool press)
 
 void game_toggle_difficulty(void)
 {
-    uint current = current_difficulty;
+    uint current = current_difficulty_id;
     difficulty_t difficulty = DIFFICULTY((current + 1));
-    current_difficulty = difficulty->id;
+
+    current_difficulty_id = difficulty->id;
 
     logger_info("Difficulty changed to %s", difficulty_name(difficulty));
     
     update_objects();
-    game_new();
+    game_reset();
 }
 
 void game_free(void)

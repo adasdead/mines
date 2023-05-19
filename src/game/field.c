@@ -41,7 +41,6 @@ static void get_cursor_pos_in_field(int *x, int *y)
     *y = window_get_instance()->cursor.y;
 
     window_normalize_pos(x, y);
-
     field_shift_pos(x, y);
 }
 

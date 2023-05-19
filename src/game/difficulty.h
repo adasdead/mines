@@ -24,21 +24,21 @@ struct difficulty {
     uint                    mines_count;
     
 } static const difficulties[] = {
-    { DIFFICULTY_BEGGINER,      9,  9, 10 },
-    { DIFFICULTY_INTERMEDIATE, 16, 16, 40 },
-    { DIFFICULTY_EXPERT,       30, 16, 99 },
+    { DIFFICULTY_BEGGINER,                       9,  9, 10 },
+    { DIFFICULTY_INTERMEDIATE,                  16, 16, 40 },
+    { DIFFICULTY_EXPERT,                        30, 16, 99 },
 };
 
 typedef const struct difficulty *difficulty_t;
 
-static const char *difficulty_name(const difficulty_t difficulty)
+static const char *difficulty_name(difficulty_t difficulty)
 {
     switch (difficulty->id)
     {
-        case DIFFICULTY_BEGGINER: return "BEGGINER";
-        case DIFFICULTY_INTERMEDIATE: return "INTERMEDIATE";
-        case DIFFICULTY_EXPERT: return "EXPERT";
-        default: return "UNKNOWN";
+        case DIFFICULTY_BEGGINER:       return "BEGGINER";
+        case DIFFICULTY_INTERMEDIATE:   return "INTERMEDIATE";
+        case DIFFICULTY_EXPERT:         return "EXPERT";
+        default:                        return "UNKNOWN";
     }
 }
 

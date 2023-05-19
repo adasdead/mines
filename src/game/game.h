@@ -9,7 +9,7 @@
 #include "util/matrix4x4.h"
 #include "util/basic_types.h"
 
-void game_new(void);
+void game_reset(void);
 void game_toggle_difficulty(void);
 
 void game_initialize(void);
