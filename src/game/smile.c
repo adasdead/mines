@@ -16,10 +16,6 @@
 
 #include "definitions.h"
 
-/* denormalizes to screen coordinates */
-#define DENORMALIZE(val)                                                    \
-    ((float) ((val) * window_get_instance()->scale))
-
 /* WARNING: x and y must not be normalized */
 static bool is_cursor_over_smile(smile_t smile, uint x, uint y)
 {
@@ -54,7 +50,7 @@ void smile_update_model_matrix(smile_t smile)
 
     if (smile != NULL) {
         x = smile->x + SMILE_OFFSET;
-        
+
         matrix4x4_identity(smile->model);
         matrix4x4_scale(smile->model, SMILE_SCALE, SMILE_SCALE);
         matrix4x4_translate(smile->model, x, y);

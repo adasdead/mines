@@ -11,6 +11,10 @@
 #include "util/matrix4x4.h"
 #include "util/basic_types.h"
 
+/* denormalizes to screen coordinates */
+#define DENORMALIZE(val)                                                    \
+    ((float) ((val) * window_get_instance()->scale))
+
 struct window {
     bool                initialized;
     GLFWwindow         *handle;
