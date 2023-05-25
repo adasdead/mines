@@ -12,7 +12,7 @@
  * Project definitions
  ***************************************************************************/
 
-#define WINDOW_NAME                     "Minesweeper v"PROJECT_VERSION
+#define WINDOW_NAME                     "Mines v"PROJECT_VERSION
 #define WINDOW_SCALE                    33.75f
 
 #define ASSETS_DIR                      "assets"
