@@ -78,11 +78,11 @@ void window_initialize(void)
 
     window.width = FIELD_LEFT_X + FIELD_RIGHT_X;
     window.width += difficulties->field_width;
-    window.width = DENORMALIZE(window.width);
+    window.width = (uint) DENORMALIZE(window.width);
     
     window.height = FIELD_LEFT_Y + FIELD_RIGHT_Y;
     window.height += difficulties->field_height;
-    window.height = DENORMALIZE(window.height);
+    window.height = (uint) DENORMALIZE(window.height);
 
     window.handle = glfwCreateWindow(window.width, window.height,
                                      WINDOW_NAME, NULL, NULL);
@@ -114,8 +114,8 @@ void window_initialize(void)
 
 void window_resize_with_normalized_sizes(int width, int height)
 {
-    window.width = DENORMALIZE(width);
-    window.height = DENORMALIZE(height);
+    window.width = (uint) DENORMALIZE(width);
+    window.height = (uint) DENORMALIZE(height);
 
     glViewport(0, 0, window.width, window.height);
 
