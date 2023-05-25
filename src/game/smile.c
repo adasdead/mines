@@ -85,13 +85,15 @@ void smile_handle_mouse(smile_t smile, uint x, uint y, bool press)
             smile->state = SMILE_STATE_CLICK;
             return;
         }
-        else
-            smile->click_callback();
     }
 
     switch (smile->state) {
         case SMILE_STATE_DEAD:
         case SMILE_STATE_COOL:
+            return;
+
+        case SMILE_STATE_CLICK:
+            smile->click_callback();
             return;
         
         default:

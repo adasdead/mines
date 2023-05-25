@@ -71,7 +71,7 @@ void window_initialize(void)
     }
 
     video_mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-    window.scale = (video_mode->height) * 1.f / WINDOW_SCALE;
+    window.scale = (video_mode->height) * (1.f / WINDOW_SCALE);
     logger_info("Scale factor: %f", window.scale);
 
     glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
