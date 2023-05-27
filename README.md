@@ -9,6 +9,21 @@ This project is written in C and uses the following libraries:
 - [glad](https://glad.dav1d.de/) - for loading OpenGL functions
 - [Discord GameSDK](https://discord.com/developers/docs/game-sdk/sdk-starter-guide) - for supporting Discord Rich Presence (optional)
 
+## Controls
+The game is controlled with the keyboard and mouse. Here are the main keys:
+
+- `D` - change difficulty
+- `N` - reset current game
+- `ESC` - close game
+
+To open a cell on the field, you need to click on it with the `left mouse button`. <br>
+To mark a mine, you need to click on it with the `right mouse button`.
+
+## Screenshots
+|                 xubuntu                 |                 windows                 |
+|:---------------------------------------:|:---------------------------------------:|
+| ![xubuntu](misc/screenshot_xubuntu.png) | ![windows](misc/screenshot_windows.png) |
+
 ## Building
 To build the project, you need to have a C compiler and CMake installed. You also need to clone the repository with submodules:
 ```sh
@@ -29,21 +44,6 @@ cmake . -Bbuild -DCMAKE_BUILD_TYPE=Release
 cmake --build ./build
 ./bin/mines # run game
 ```
-
-## Controls
-The game is controlled with the keyboard and mouse. Here are the main keys:
-
-- `D` - change difficulty
-- `N` - reset current game
-- `ESC` - close game
-
-To open a cell on the field, you need to click on it with the `left mouse button`. <br>
-To mark a mine, you need to click on it with the `right mouse button`.
-
-## Screenshots
-|                 xubuntu                 |                 windows                 |
-|:---------------------------------------:|:---------------------------------------:|
-| ![xubuntu](misc/screenshot_xubuntu.png) | ![windows](misc/screenshot_windows.png) |
 
 ## License
 The project is distributed under the MIT license. See [LICENSE](LICENSE) file for details.
