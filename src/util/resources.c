@@ -7,7 +7,7 @@
 
 #include <stb/stb_image.h>
 
-#include "definitions.h"
+#include "settings/definitions.h"
 
 static texture_t texture_atlas;
 static shader_t shaders[RS_SHADER_TOTAL];

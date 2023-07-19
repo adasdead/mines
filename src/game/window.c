@@ -12,7 +12,7 @@
 
 #include "util/logger.h"
 
-#include "definitions.h"
+#include "settings/definitions.h"
 
 static struct window window = {0};
 

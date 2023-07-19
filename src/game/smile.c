@@ -14,7 +14,7 @@
 #include "util/resources.h"
 #include "util/logger.h"
 
-#include "definitions.h"
+#include "settings/definitions.h"
 
 /* WARNING: x and y must not be normalized */
 static bool is_cursor_over_smile(smile_t smile, uint x, uint y)
