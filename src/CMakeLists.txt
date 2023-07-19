@@ -6,7 +6,7 @@ find_package(OpenGL REQUIRED)
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_executable(${PROJECT_NAME} main.c)
 else()
-    add_executable(${PROJECT_NAME} WIN32 main.c mines.rc)
+    add_executable(${PROJECT_NAME} WIN32 main.c windows/mines.rc)
 endif()
 
 if (DISCORD_SDK_FOUND)
@@ -20,7 +20,7 @@ if (DISCORD_SDK_FOUND)
     )
 endif()
 
-configure_file(version.h.in version.h @ONLY)
+configure_file(settings/version.h.in settings/version.h @ONLY)
 
 target_sources(${PROJECT_NAME} PRIVATE
     game/game.c

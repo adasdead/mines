@@ -11,7 +11,7 @@
 #include "util/matrix4x4.h"
 #include "util/basic_types.h"
 
-#include "definitions.h"
+#include "settings/definitions.h"
 
 struct internal;
 

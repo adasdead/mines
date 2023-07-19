@@ -11,7 +11,7 @@
 #include "util/resources.h"
 #include "util/logger.h"
 
-#include "definitions.h"
+#include "settings/definitions.h"
 
 enum border_titles {
     BORDER_TT_BACKGROUND,

@@ -18,7 +18,7 @@
 #include "util/discord.h"
 #include "util/logger.h"
 
-#include "definitions.h"
+#include "settings/definitions.h"
 
 enum game_state {
     GAME_STATE_IDLE,

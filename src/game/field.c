@@ -14,7 +14,7 @@
 #include "util/resources.h"
 #include "util/logger.h"
 
-#include "definitions.h"
+#include "settings/definitions.h"
 
 static void shuffle(int *array, size_t size)
 {

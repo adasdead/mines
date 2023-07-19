@@ -6,7 +6,7 @@
 #ifndef DEFINITIONS_H
 #define DEFINITIONS_H
 
-#include "version.h"
+#include "settings/version.h"
 
 /****************************************************************************
  * Project definitions
