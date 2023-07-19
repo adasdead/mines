@@ -9,7 +9,7 @@ set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_INSTALL OFF CACHE BOOL "" FORCE)
-add_subdirectory(${PROJECT_DEPS_DIR}/glfw)
+add_subdirectory(${PROJECT_3RD_PARTY_DIR}/glfw)
 
 #############################################################################
 # GLAD                                                                      #
@@ -21,11 +21,11 @@ add_library(glad STATIC glad/glad.c)
 # Discord SDK                                                               #
 #############################################################################
 
-if(EXISTS "${PROJECT_DEPS_DIR}/discord_sdk" AND WIN32)
+if(EXISTS "${PROJECT_3RD_PARTY_DIR}/discord_sdk" AND WIN32)
     message(STATUS "Discord SDK found!")
 
     set(DISCORD_SDK_FOUND ON PARENT_SCOPE)
-    set(DISCORD_SDK_DIR "${PROJECT_DEPS_DIR}/discord_sdk")
+    set(DISCORD_SDK_DIR "${PROJECT_3RD_PARTY_DIR}/discord_sdk")
     set(DISCORD_SDK_INCLUDE_DIR "${DISCORD_SDK_DIR}/c" CACHE INTERNAL "")
 
     set(DISCORD_SDK_LIBRARY

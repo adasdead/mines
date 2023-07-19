@@ -48,7 +48,7 @@ target_link_libraries(${PROJECT_NAME}
 
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${PROJECT_SOURCE_DIR}
-    ${PROJECT_DEPS_DIR}
+    ${PROJECT_3RD_PARTY_DIR}
     ${CMAKE_CURRENT_BINARY_DIR}
     ${DISCORD_SDK_INCLUDE_DIR}
 )

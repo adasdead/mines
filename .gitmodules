@@ -1,6 +1,6 @@
-[submodule "deps/glfw"]
-	path = deps/glfw
+[submodule "3rd-party/glfw"]
+	path = 3rd-party/glfw
 	url = https://github.com/glfw/glfw
-[submodule "deps/stb"]
-	path = deps/stb
+[submodule "3rd-party/stb"]
+	path = 3rd-party/stb
 	url = https://github.com/nothings/stb
